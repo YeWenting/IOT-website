@@ -1,13 +1,7 @@
 #coding=utf-8
 
-from django.conf.urls import url
+from django.conf.urls import url, include
 from . import views
-
-from tastypie.api import Api
-from IOTapp.api.resources import DevicelistResource
-
-device_api = Api(api_name='device')
-device_api.register(DevicelistResource())
 
 
 urlpatterns = [
@@ -24,6 +18,5 @@ urlpatterns = [
     # url(r'^contacts/delete/$', views.delete),
     # url(r'^contacts/edit/$', views.edit),
     # url(r'^contacts/find/$', views.find)
-
-    url(r'^api/', include(device_api.urls)),
+    url(r'^api/getlist/', views.get_list)
 ]

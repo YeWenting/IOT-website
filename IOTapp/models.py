@@ -6,6 +6,8 @@ from django.db import models
 class Device(models.Model):
     SN = models.CharField(max_length=10)
     name = models.CharField(max_length=20)
-    temp_array = models.TextField
-    time_array = models.TextField
-    threshold = models.IntegerField
+    last_updated = models.DateTimeField()
+    cur_temp = models.IntegerField()
+    temp_string = models.TextField()
+    time_string = models.TextField()
+    threshold = models.IntegerField()

@@ -3,12 +3,27 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
+from IOTapp.models import Device
 
 # Create your views here.
 
 
 def get_index(request):
-    return HttpResponseRedirect('/static/index.html')
+    # Device.objects.create(SN="SN124", name="Bedroom", last_updated="2016-01-01 16:03", cur_temp=30, threshold=30)
+    list = []
+    devices = Device.objects.all()
+
+    for dev in devices:
+        if dev.cur_temp > dev.threshold:
+            is_warning = True
+        else:
+            is_warning = False
+        print(dev.last_updated)
+        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.cur_temp, "is_warning": is_warning,
+                    "last_updated": dev.last_updated}
+        list.append(temp_dev)
+
+    return render(request, 'index.html', {'deviceList': list})
 
 
 def switch_index(request):
@@ -58,4 +73,24 @@ def get_sign_up(request):
 def get_logout(request):
     logout(request)
     return HttpResponseRedirect("/")
+
+
+# API Method
+def get_list(request):
+    list = []
+    devices = Device.objects.all()
+
+    for dev in devices:
+        if dev.cur_temp > dev.threshold:
+            is_warning = True
+        else:
+            is_warning = False
+        print(dev.last_updated)
+        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.cur_temp, "is_warning": is_warning,
+                    "last_updated": dev.last_updated}
+        list.append(temp_dev)
+
+    res = {"deviceList": list}
+    return JsonResponse(res)
+
 
