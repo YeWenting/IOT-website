@@ -55,10 +55,6 @@ def get_login(request):
         return JsonResponse(response, safe=False)
 
 
-def get_logout(request):
-    logout(request)
-
-
 def get_sign_up(request):
     if request.method == 'GET':
         return render(request, 'sign-up.html')

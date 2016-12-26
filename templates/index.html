@@ -161,7 +161,7 @@
                 <li>
                     <a href="#">
                         <i class="linecons-pencil"></i>
-                        <span class="title add-device">Add Devices</span>
+                        <span class="title add-device" onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" >Add Devices</span>
                     </a>
                 </li>
                 <li class="opened active">
@@ -335,14 +335,16 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Devices List</h3>
-                <span onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" class="fa fa-plus pull-right " style="cursor: pointer"> </span>
+{#                <a href="javascript:" onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" class="fa fa-plus pull-right "> </a>#}
+                <span onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});"
+                      class="fa fa-plus pull-right " style="cursor: pointer"> </span>
             </div>
 
             <div class="panel-body">
 
                 <script type="text/javascript">
                     jQuery(document).ready(function ($) {
-                        $("#example-1").dataTable({
+                        $("#device-table").dataTable({
                             aLengthMenu: [
                                 [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]
                             ]
@@ -373,7 +375,7 @@
                     </tr>
                     </tfoot>
                     <tbody>
-                        {% for x in deviceList %}
+                    {% for x in deviceList %}
                         <tr>
                             <td>{{ x.SN }}</td>
                             <td>{{ x.name }}</td>
@@ -392,8 +394,8 @@
                                 </a>
                             </td>
                         </tr>
-                        {% endfor %}
-                        </tbody>
+                    {% endfor %}
+                    </tbody>
                 </table>
 
             </div>
@@ -430,22 +432,22 @@
     </div>
 </div>
 <div class="modal fade" id="add-device">
-		<div class="modal-dialog">
-			<div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content">
 
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-					<h4 class="modal-title">New Device</h4>
-				</div>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">New Device</h4>
+            </div>
 
-				<div class="modal-body">
+            <div class="modal-body">
 
-					<div class="row">
+                <div class="row">
                     <div class="col-md-6">
 
                         <div class="form-group">
-                            <label for="SN" class="control-label">SN</label>
-                            <input type="text" class="form-control" id="SN" placeholder="identification">
+                            <label for="add_SN" class="control-label">SN</label>
+                            <input type="text" class="form-control" id="add_SN" placeholder="identification">
                         </div>
 
                     </div>
@@ -453,8 +455,8 @@
                     <div class="col-md-6">
 
                         <div class="form-group">
-                            <label for="device-name" class="control-label">Device Name</label>
-                            <input type="text" class="form-control" id="device-name" placeholder="name">
+                            <label for="add_device_name" class="control-label">Device Name</label>
+                            <input type="text" class="form-control" id="add_device_name" placeholder="name">
                         </div>
 
                     </div>
@@ -463,15 +465,15 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="temperature" class="control-label">Temperature(℃)</label>
-                            <input type="text" class="form-control" id="temperature" placeholder="current temp">
+                            <label for="add_temperature" class="control-label">Temperature(℃)</label>
+                            <input type="text" class="form-control" id="add_temperature" placeholder="current temp">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="threshold" class="control-label">Warning Threshold(℃)</label>
-                            <input type="text" class="form-control" id="threshold" placeholder="dangerous temp">
+                            <label for="add_threshold" class="control-label">Warning Threshold(℃)</label>
+                            <input type="text" class="form-control" id="add_threshold" placeholder="dangerous temp">
                         </div>
                     </div>
                 </div>
@@ -479,8 +481,9 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">
-                            <label for="last-updated" class="control-label">Last Updated</label>
-                            <input type="text" class="form-control" id="last-updated" placeholder="YYYY-MM-DD HH:MM:SS">
+                            <label for="add_last_updated" class="control-label">Last Updated</label>
+                            <input type="text" class="form-control" id="add_last_updated"
+                                   placeholder="YYYY-MM-DD HH:MM:SS">
                         </div>
                     </div>
                 </div>
@@ -489,23 +492,23 @@
                     <div class="col-md-12">
 
                         <div class="form-group no-margin">
-                            <label for="history-log" class="control-label">History Log</label>
-                            <textarea class="form-control autogrow" id="history-log"
+                            <label for="add_history_log" class="control-label">History Log</label>
+                            <textarea class="form-control autogrow" id="add_history_log"
                                       placeholder="YYYY:MM:DD HH:MM:SS, temperature, "></textarea>
                         </div>
 
                     </div>
                 </div>
 
-				</div>
+            </div>
 
-				<div class="modal-footer">
-					<button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-info">Save changes</button>
-				</div>
-			</div>
-		</div>
-	</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info" id="add-button">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="page-loading-overlay">
     <div class="loader-2"></div>
@@ -514,11 +517,114 @@
 <!-- My Script -->
 <script>
     $(document).ready(
-{#        reload_table()#}
-        $('.add-button').click(
+        {#        reload_table()#}
+        $("form#login").validate({
+            rules: {
+                SN: {
+                    required: true
+                },
 
-        )
+                device_name: {
+                    required: true
+                },
+
+                temperature: {
+                    required: true,
+                    number:   true
+                },
+
+                threshold: {
+                    required: true,
+                    number:   true
+                },
+
+                last_updated: {
+                    required: true
+                },
+
+                history_log: {
+                    required: true
+                }
+            },
+
+            messages: {
+                SN: {
+                    required: 'Please enter SN.'
+                },
+
+                device_name: {
+                    required: 'Please enter device_name.'
+                },
+
+                temperature: {
+                    required: 'Please enter temperature.',
+                    number:   'Please enter a number'
+                },
+
+                last_updated: {
+                    required: 'Please enter last updated time.'
+                },
+
+                threshold: {
+                    required: 'Please enter threshold.',
+                    number:   'Please enter a number'
+                },
+
+                history_log: {
+                    required: 'Please enter history log.'
+                }
+            },
+
+            // Form Processing via AJAX
+            submitHandler: function (form) {
+                show_loading_bar(70); // Fill progress bar to 70% (just a given value)
+
+                var opts = {
+                    "closeButton": true,
+                    "debug": false,
+                    "positionClass": "toast-top-full-width",
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+
+                $.ajax({
+                    url: "/accounts/login/",
+                    method: 'POST',
+                    dataType: 'json',
+                    data: {
+                        username: $(form).find('#username').val(),
+                        password: $(form).find('#passwd').val()
+                    },
+                    success: function (resp) {
+                        show_loading_bar({
+                            delay: .5,
+                            pct: 100,
+                            finish: function () {
+                                // Redirect after successful login page (when progress bar reaches 100%)
+                                if (resp == true) {
+                                    window.location = '/home/';
+                                }
+                                else {
+                                    toastr.error("You have entered wrong password, please try again :)", "Invalid Login!", opts);
+                                    $passwd.select();
+                                }
+                            }
+                        });
+
+                    }
+                });
+
+            }
+        });
     )
+    ;
     function reload_table() {
         console.log(2);
         $.ajax({
@@ -530,16 +636,16 @@
                 var htmlstr = "";
                 for (var i = 0; i < data.deviceList.length; i++) {
                     htmlstr = htmlstr + "<tr>" +
-                            "<td class='hidden'>" + data.deviceList[i].id + "</td>" +
-                            "<td>" + data.deviceList[i].SN + "</td>" +
-                            "<td>" + data.deviceList[i].name + "</td>" +
-                            "<td>" + data.deviceList[i].temp + "</td>" +
-                            "<td>" + data.deviceList[i].last_updated + "</td>" +
-                            "<td>" + data.deviceList[i].is_warning + "</td>" +
-                            '<td> <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left">Edit</a>' +
-                            '<a href="#" class="btn btn-danger btn-sm btn-icon icon-left">Delete </a>' +
-                            '<a href="#" class="btn btn-info btn-sm btn-icon icon-left">History </a>' +
-                            '</td></tr>';
+                        "<td class='hidden'>" + data.deviceList[i].id + "</td>" +
+                        "<td>" + data.deviceList[i].SN + "</td>" +
+                        "<td>" + data.deviceList[i].name + "</td>" +
+                        "<td>" + data.deviceList[i].temp + "</td>" +
+                        "<td>" + data.deviceList[i].last_updated + "</td>" +
+                        "<td>" + data.deviceList[i].is_warning + "</td>" +
+                        '<td> <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left">Edit</a>' +
+                        '<a href="#" class="btn btn-danger btn-sm btn-icon icon-left">Delete </a>' +
+                        '<a href="#" class="btn btn-info btn-sm btn-icon icon-left">History </a>' +
+                        '</td></tr>';
                 }
 
                 $("#device-table").children("tbody").html(htmlstr);
