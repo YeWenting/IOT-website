@@ -335,7 +335,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Devices List</h3>
-                <span class="fa fa-plus pull-right add-device"></span>
+                <span onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" class="fa fa-plus pull-right " style="cursor: pointer"> </span>
             </div>
 
             <div class="panel-body">
@@ -350,7 +350,7 @@
                     });
                 </script>
 
-                <table id="example-1" class="table table-striped table-bordered" cellspacing="0" width="100%">
+                <table id="device-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
                     <tr>
                         <th>SN</th>
@@ -429,6 +429,127 @@
         </footer>
     </div>
 </div>
+<div class="modal fade" id="add-device">
+		<div class="modal-dialog">
+			<div class="modal-content">
+
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+					<h4 class="modal-title">New Device</h4>
+				</div>
+
+				<div class="modal-body">
+
+					<div class="row">
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="SN" class="control-label">SN</label>
+                            <input type="text" class="form-control" id="SN" placeholder="identification">
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="device-name" class="control-label">Device Name</label>
+                            <input type="text" class="form-control" id="device-name" placeholder="name">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="temperature" class="control-label">Temperature(℃)</label>
+                            <input type="text" class="form-control" id="temperature" placeholder="current temp">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="threshold" class="control-label">Warning Threshold(℃)</label>
+                            <input type="text" class="form-control" id="threshold" placeholder="dangerous temp">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last-updated" class="control-label">Last Updated</label>
+                            <input type="text" class="form-control" id="last-updated" placeholder="YYYY-MM-DD HH:MM:SS">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="form-group no-margin">
+                            <label for="history-log" class="control-label">History Log</label>
+                            <textarea class="form-control autogrow" id="history-log"
+                                      placeholder="YYYY:MM:DD HH:MM:SS, temperature, "></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-info">Save changes</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<div class="page-loading-overlay">
+    <div class="loader-2"></div>
+</div>
+
+<!-- My Script -->
+<script>
+    $(document).ready(
+{#        reload_table()#}
+        $('.add-button').click(
+
+        )
+    )
+    function reload_table() {
+        console.log(2);
+        $.ajax({
+            url: "/api/getlist/",
+            type: "get",
+            dataType: "JSON",
+            success: function (data) {
+                $("#device-table").children("tbody").empty()
+                var htmlstr = "";
+                for (var i = 0; i < data.deviceList.length; i++) {
+                    htmlstr = htmlstr + "<tr>" +
+                            "<td class='hidden'>" + data.deviceList[i].id + "</td>" +
+                            "<td>" + data.deviceList[i].SN + "</td>" +
+                            "<td>" + data.deviceList[i].name + "</td>" +
+                            "<td>" + data.deviceList[i].temp + "</td>" +
+                            "<td>" + data.deviceList[i].last_updated + "</td>" +
+                            "<td>" + data.deviceList[i].is_warning + "</td>" +
+                            '<td> <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left">Edit</a>' +
+                            '<a href="#" class="btn btn-danger btn-sm btn-icon icon-left">Delete </a>' +
+                            '<a href="#" class="btn btn-info btn-sm btn-icon icon-left">History </a>' +
+                            '</td></tr>';
+                }
+
+                $("#device-table").children("tbody").html(htmlstr);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert('获取数据错误');
+            }
+        })
+    }
+</script>
 
 <!-- Imported styles on this page -->
 <link rel="stylesheet" href="/static/js/datatables/dataTables.bootstrap.css">
@@ -451,8 +572,5 @@
 
 <!-- JavaScripts initializations and stuff -->
 <script src="/static/js/xenon-custom.js"></script>
-<div class="page-loading-overlay">
-    <div class="loader-2"></div>
-</div>
 </body>
 </html>

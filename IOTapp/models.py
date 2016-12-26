@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -11,3 +12,4 @@ class Device(models.Model):
     temp_string = models.TextField()
     time_string = models.TextField()
     threshold = models.IntegerField()
+    user = models.ForeignKey(User)

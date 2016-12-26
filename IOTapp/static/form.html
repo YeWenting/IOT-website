@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<div class="modal fade" id="add-device">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">New Device</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="SN" class="control-label">SN</label>
+                            <input type="text" class="form-control" id="SN" placeholder="identification">
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="device-name" class="control-label">Device Name</label>
+                            <input type="text" class="form-control" id="device-name" placeholder="name">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="temperature" class="control-label">Temperature</label>
+                            <input type="text" class="form-control" id="temperature" placeholder="current temp">
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="threshold" class="control-label">Warning Threshold</label>
+                            <input type="text" class="form-control" id="threshold" placeholder="dangerous temp">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="last-updated" class="control-label">Last Updated</label>
+                            <input type="text" class="form-control" id="last-updated" placeholder="YYYY-MM-DD HH:MM:SS">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="form-group no-margin">
+                            <label for="history-log" class="control-label">History Log</label>
+                            <textarea class="form-control autogrow" id="history-log"
+                                      placeholder="YYYY:MM:DD HH:MM:SS, temperature"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-info">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+</html>
+</body>
