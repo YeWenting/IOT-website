@@ -16,12 +16,12 @@ def get_index(request):
     devices = Device.objects.filter(user=userid)
 
     for dev in devices:
-        if dev.cur_temp > dev.threshold:
+        if dev.temperature > dev.threshold:
             is_warning = True
         else:
             is_warning = False
         print(dev.last_updated)
-        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.cur_temp, "is_warning": is_warning,
+        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.temperature, "is_warning": is_warning,
                     "last_updated": dev.last_updated}
         list.append(temp_dev)
 
@@ -86,12 +86,12 @@ def get_list(request):
     devices = Device.objects.all()
 
     for dev in devices:
-        if dev.cur_temp > dev.threshold:
+        if dev.temperature > dev.threshold:
             is_warning = True
         else:
             is_warning = False
         print(dev.last_updated)
-        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.cur_temp, "is_warning": is_warning,
+        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.temperature, "is_warning": is_warning,
                     "last_updated": str(dev.last_updated)}
         list.append(temp_dev)
 
@@ -101,5 +101,51 @@ def get_list(request):
 
 def get_form(request):
     return render(request, 'static/form.html')
+
+
+def add_device(request):
+    # Get info
+    SN = request.POST['SN']
+    name = request.POST['name']
+    last_updated = request.POST['last_updated']
+    temperature = int(request.POST['temperature'])
+    threshold = int(request.POST['threshold'])
+    userid = request.session['userid']
+
+    # Process the request
+    if len(Device.objects.filter(user=userid, SN=SN)) > 0:
+        resp = {"status": "existed"}
+        print("repeat")
+    else:
+        try:
+            user = User.objects.get(id=userid)
+            Device.objects.create(SN=SN, name=name, last_updated=last_updated,
+                                           temperature=temperature, threshold=threshold, user=user)
+            resp = {"status": "success"}
+            print("success")
+        except:
+            resp = {"status": "invalid"}
+            print("fail")
+
+    return JsonResponse(resp)
+
+
+def delete_device(request):
+    print(request.POST['device_id'])
+    device_id = int(request.POST['device_id'])
+    devices = Device.objects.filter(id=device_id)
+
+    if len(devices) < 0:
+        resp = False
+    else:
+        resp = True
+        devices.delete()
+
+    return JsonResponse(resp, safe=False)
+
+
+
+
+
 
 

@@ -27,7 +27,9 @@
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
-
+<style>
+    .error{color:#d5080f}
+</style>
 
 </head>
 <body class="page-body">
@@ -383,15 +385,31 @@
                             <td>{{ x.last_updated }}</td>
                             <td>{{ x.is_warning }}</td>
                             <td>
-                                <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left">
+                                <a type="button" class="btn btn-secondary btn-sm btn-icon icon-left edit-button">
                                     Edit
                                 </a>
-                                <a href="#" class="btn btn-danger btn-sm btn-icon icon-left">
+                                <a type="button" class="btn btn-danger btn-sm btn-icon icon-left delete-button">
                                     Delete
                                 </a>
-                                <a href="#" class="btn btn-info btn-sm btn-icon icon-left">
+                                <a type="button" class="btn btn-info btn-sm btn-icon icon-left history-button">
                                     History
                                 </a>
+                                <span class='hidden device-id'>{{ x.id }}</span>
+                                <div class="btn-group">
+									<button type="button" class="btn btn-blue dropdown-toggle btn-sm " data-toggle=
+                                            "dropdown" style="padding-top: 2px; padding-bottom: 2px; margin-left: 5px">
+										Action
+                                        <span class="caret"></span>
+									</button>
+									<ul class="dropdown-menu dropdown-blue" role="menu">
+										<li>
+											<a href="#">Open</a>
+										</li>
+										<li>
+											<a href="#">Close</a>
+										</li>
+									</ul>
+								</div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -431,9 +449,9 @@
         </footer>
     </div>
 </div>
-<div class="modal fade" id="add-device">
+<form class="modal fade" id="add-device"  role="form">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div class="modal-content" style="margin-top: 150px" >
 
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -447,7 +465,7 @@
 
                         <div class="form-group">
                             <label for="add_SN" class="control-label">SN</label>
-                            <input type="text" class="form-control" id="add_SN" placeholder="identification">
+                            <input type="text" class="form-control" id="add_SN" name="add_SN" placeholder="identification">
                         </div>
 
                     </div>
@@ -456,7 +474,7 @@
 
                         <div class="form-group">
                             <label for="add_device_name" class="control-label">Device Name</label>
-                            <input type="text" class="form-control" id="add_device_name" placeholder="name">
+                            <input type="text" class="form-control" id="add_device_name" name="add_device_name" placeholder="name">
                         </div>
 
                     </div>
@@ -466,14 +484,14 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="add_temperature" class="control-label">Temperature(℃)</label>
-                            <input type="text" class="form-control" id="add_temperature" placeholder="current temp">
+                            <input type="text" class="form-control" id="add_temperature" name="add_temperature" placeholder="current temp">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="add_threshold" class="control-label">Warning Threshold(℃)</label>
-                            <input type="text" class="form-control" id="add_threshold" placeholder="dangerous temp">
+                            <input type="text" class="form-control" id="add_threshold" name="add_threshold" placeholder="dangerous temp">
                         </div>
                     </div>
                 </div>
@@ -482,21 +500,9 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="add_last_updated" class="control-label">Last Updated</label>
-                            <input type="text" class="form-control" id="add_last_updated"
+                            <input type="text" class="form-control" id="add_last_updated" name="add_last_updated"
                                    placeholder="YYYY-MM-DD HH:MM:SS">
                         </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-12">
-
-                        <div class="form-group no-margin">
-                            <label for="add_history_log" class="control-label">History Log</label>
-                            <textarea class="form-control autogrow" id="add_history_log"
-                                      placeholder="YYYY:MM:DD HH:MM:SS, temperature, "></textarea>
-                        </div>
-
                     </div>
                 </div>
 
@@ -504,82 +510,22 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-info" id="add-button">Create</button>
+                <button type="submit" class="btn btn-info" id="add-button">Create</button>
             </div>
         </div>
     </div>
-</div>
+</form>
 
 <div class="page-loading-overlay">
     <div class="loader-2"></div>
 </div>
 
 <!-- My Script -->
+{#add {} will destory it #}
 <script>
-    $(document).ready(
-        {#        reload_table()#}
-        $("form#login").validate({
-            rules: {
-                SN: {
-                    required: true
-                },
-
-                device_name: {
-                    required: true
-                },
-
-                temperature: {
-                    required: true,
-                    number:   true
-                },
-
-                threshold: {
-                    required: true,
-                    number:   true
-                },
-
-                last_updated: {
-                    required: true
-                },
-
-                history_log: {
-                    required: true
-                }
-            },
-
-            messages: {
-                SN: {
-                    required: 'Please enter SN.'
-                },
-
-                device_name: {
-                    required: 'Please enter device_name.'
-                },
-
-                temperature: {
-                    required: 'Please enter temperature.',
-                    number:   'Please enter a number'
-                },
-
-                last_updated: {
-                    required: 'Please enter last updated time.'
-                },
-
-                threshold: {
-                    required: 'Please enter threshold.',
-                    number:   'Please enter a number'
-                },
-
-                history_log: {
-                    required: 'Please enter history log.'
-                }
-            },
-
-            // Form Processing via AJAX
-            submitHandler: function (form) {
-                show_loading_bar(70); // Fill progress bar to 70% (just a given value)
-
-                var opts = {
+    jQuery(document).ready(function($)
+    {
+        var opts = {
                     "closeButton": true,
                     "debug": false,
                     "positionClass": "toast-top-full-width",
@@ -594,13 +540,85 @@
                     "hideMethod": "fadeOut"
                 };
 
+        $(".delete-button").on("click", function ()
+        {
+            console.log($(this).closest("tr"));
+            id = $(this).closest("tr").find(".device-id").text();
+            console.log(id);
+            $.post("/devices/delete/", {device_id: id}, function(resp)
+            {
+                if (resp)
+                {
+                    toastr.success("Device has been deleted successfully!", "Success", opts);
+                    reload_table();
+                }
+                else toastr.error("Deletion failed:(", "Fail", opts);
+            });
+        });
+
+        $("form#add-device").validate({
+            rules: {
+                add_SN: {
+                    required: true
+                },
+
+                add_device_name: {
+                    required: true
+                },
+
+                add_temperature: {
+                    required: true,
+                    number: true
+                },
+
+                add_threshold: {
+                    required: true,
+                    number: true
+                },
+
+                add_last_updated: {
+                    required: true
+                }
+            },
+
+            messages: {
+                add_SN: {
+                    required: 'Please enter SN.'
+                },
+
+                add_device_name: {
+                    required: 'Please enter device name.'
+                },
+
+                add_temperature: {
+                    required: 'Please enter temperature.',
+                    number: 'Please enter a number.'
+                },
+
+                add_last_updated: {
+                    required: 'Please enter last updated field.'
+                },
+
+                add_threshold: {
+                    required: 'Please enter threshold.',
+                    number: 'Please enter a number.'
+                }
+            },
+
+            // Form Processing via AJAX
+            submitHandler: function (form) {
+                show_loading_bar(70); // Fill progress bar to 70% (just a given value)
+
                 $.ajax({
-                    url: "/accounts/login/",
+                    url: "/adddevice/",
                     method: 'POST',
                     dataType: 'json',
                     data: {
-                        username: $(form).find('#username').val(),
-                        password: $(form).find('#passwd').val()
+                        SN: $(form).find('#add_SN').val(),
+                        name: $(form).find('#add_device_name').val(),
+                        last_updated: $(form).find('#add_last_updated').val(),
+                        temperature: $(form).find('#add_temperature').val(),
+                        threshold: $(form).find('#add_threshold').val()
                     },
                     success: function (resp) {
                         show_loading_bar({
@@ -608,12 +626,16 @@
                             pct: 100,
                             finish: function () {
                                 // Redirect after successful login page (when progress bar reaches 100%)
-                                if (resp == true) {
-                                    window.location = '/home/';
+                                if (resp.status == "success") {
+                                    reload_table();
+                                    $('#add-device').modal('hide');
+                                    toastr.success("Add successfully!", "Success", opts);
+                                }
+                                else if (resp.status == "existed") {
+                                    toastr.error("The device" + $(form).find('#add_SN').val() + " has existed", "Error", opts);
                                 }
                                 else {
-                                    toastr.error("You have entered wrong password, please try again :)", "Invalid Login!", opts);
-                                    $passwd.select();
+                                    toastr.error("Your input data is invalid! Please try again.", "Error", opts);
                                 }
                             }
                         });
@@ -623,7 +645,7 @@
 
             }
         });
-    )
+    })
     ;
     function reload_table() {
         console.log(2);
@@ -636,7 +658,7 @@
                 var htmlstr = "";
                 for (var i = 0; i < data.deviceList.length; i++) {
                     htmlstr = htmlstr + "<tr>" +
-                        "<td class='hidden'>" + data.deviceList[i].id + "</td>" +
+                        "<span class='hidden'>" + data.deviceList[i].id + "</span>" +
                         "<td>" + data.deviceList[i].SN + "</td>" +
                         "<td>" + data.deviceList[i].name + "</td>" +
                         "<td>" + data.deviceList[i].temp + "</td>" +
@@ -668,13 +690,14 @@
 <script src="/static/js/xenon-api.js"></script>
 <script src="/static/js/xenon-toggles.js"></script>
 <script src="/static/js/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/toastr/toastr.min.js"></script>
 
 
 <!-- Imported scripts on this page -->
 <script src="/static/js/datatables/dataTables.bootstrap.js"></script>
 <script src="/static/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>
 <script src="/static/js/datatables/tabletools/dataTables.tableTools.min.js"></script>
-
+<script src="/static/js/jquery-validate/jquery.validate.min.js"></script>
 
 <!-- JavaScripts initializations and stuff -->
 <script src="/static/js/xenon-custom.js"></script>
