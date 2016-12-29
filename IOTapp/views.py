@@ -132,7 +132,7 @@ def add_device(request):
         try:
             user = User.objects.get(id=userid)
             Device.objects.create(SN=SN, name=name, last_updated=last_updated,
-                                           temperature=temperature, threshold=threshold, user=user)
+                                           temperature=temperature, threshold=threshold, user=user, is_open=True)
             resp = {"status": "success"}
             print("success")
         except:

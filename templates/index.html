@@ -31,7 +31,7 @@
         .error {
             color: #d5080f
         }
-        .action-checkbox:{
+        .action-checkbox {
             padding-top: 2px; padding-bottom: 2px; margin-left: 5px
         }
     </style>
@@ -352,10 +352,11 @@
 
                 <script type="text/javascript">
                     jQuery(document).ready(function ($) {
-                        $("#device-table").dataTable({
-                            aLengthMenu: [
-                                [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]
-                            ]
+                        var table = $("#device-table").dataTable({
+{#                            aLengthMenu: [#}
+{#                                [10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]#}
+{#                            ]#}
+
                         });
                     });
                 </script>
@@ -400,13 +401,12 @@
                                 <a type="button" class="btn btn-info btn-sm btn-icon icon-left history-button">
                                     History
                                 </a>
-                                <span class='hidden device-id'>{{ x.id }}</span>
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-blue dropdown-toggle btn-sm " data-toggle=
-                                            "dropdown" style="padding-top: 2px; padding-bottom: 2px; margin-left: 5px">
+                                    <a type="button" class="btn btn-blue dropdown-toggle btn-sm action-checkbox"
+                                            data-toggle="dropdown" style="margin-left:5px">
                                         {{ x.status }}
                                         <span class="caret"></span>
-                                    </button>
+                                    </a>
                                     <ul class="dropdown-menu dropdown-blue" role="menu">
                                         <li>
                                             <a href="#">Open</a>
@@ -416,6 +416,7 @@
                                         </li>
                                     </ul>
                                 </div>
+                                <span class='hidden device-id'>{{ x.id }}</span>
                             </td>
                         </tr>
                     {% endfor %}
@@ -530,9 +531,23 @@
     <div class="loader-2"></div>
 </div>
 
+
+
+<!-- Imported styles on this page -->
+<link rel="stylesheet" href="/static/js/datatables/dataTables.bootstrap.css">
+
+<!-- Bottom Scripts -->
+<script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/TweenMax.min.js"></script>
+<script src="/static/js/resizeable.js"></script>
+<script src="/static/js/joinable.js"></script>
+<script src="/static/js/xenon-api.js"></script>
+<script src="/static/js/xenon-toggles.js"></script>
+<script src="/static/js/datatables/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/toastr/toastr.min.js"></script>
 <!-- My Script -->
-{#add {} will destory it #}
 <script>
+    var first = true;
     jQuery(document).ready(function ($) {
         var opts = {
             "closeButton": true,
@@ -549,13 +564,15 @@
             "hideMethod": "fadeOut"
         };
 
-        $(".delete-button").on("click", function () {
-            console.log($(this).closest("tr"));
+        $("#device-table").on("click", ".delete-button", function ()
+        {
             id = $(this).closest("tr").find(".device-id").text();
-            console.log(id);
-            $.post("/devices/delete/", {device_id: id}, function (resp) {
-                if (resp) {
+            $.post("/devices/delete/", {device_id: id}, function (resp)
+            {
+                if (resp)
+                {
                     toastr.success("Device has been deleted successfully!", "Success", opts);
+                    $('#add-device').modal('hide');
                     reload_table();
                 }
                 else toastr.error("Deletion failed:(", "Fail", opts);
@@ -651,20 +668,19 @@
 
             }
         });
-    })
-    ;
+{#        reload_table();#}
+    });
     function reload_table() {
-        console.log(2);
         $.ajax({
             url: "/api/getlist/",
             type: "get",
             dataType: "JSON",
             success: function (data) {
-                $("#device-table").children("tbody").empty()
+                console.log(1);
+                $("#device-table").children("tbody").empty();
                 var htmlstr = "";
                 for (var i = 0; i < data.deviceList.length; i++) {
                     htmlstr = htmlstr + "<tr>" +
-                        "<span class='hidden'>" + data.deviceList[i].id + "</span>" +
                         "<td>" + data.deviceList[i].SN + "</td>" +
                         "<td>" + data.deviceList[i].name + "</td>" +
                         "<td>" + data.deviceList[i].temp + "</td>" +
@@ -673,16 +689,20 @@
                         '<td> <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left">Edit</a>' +
                         '<a href="#" class="btn btn-danger btn-sm btn-icon icon-left">Delete </a>' +
                         '<a href="#" class="btn btn-info btn-sm btn-icon icon-left">History </a>' +
-                        '<td> <div class="btn-group">' +
+                        '<div class="btn-group ">' +
                         '<button type="button" class="btn btn-blue dropdown-toggle btn-sm action-checkbox"' +
-                        'data-toggle="dropdown">' + data.deviceList[i].status +
+                        'data-toggle="dropdown" style="margin-left:5px">' + data.deviceList[i].status +
                         '<span class="caret"></span> </button>' +
                         '<ul class="dropdown-menu dropdown-blue" role="menu">' +
-                        '<li><a href="#">Open</a></li><li><a href="#">Close</a></li></ul></div></td></tr>';
-                    '</td></tr>';
+                        '<li><a href="#">Open</a></li><li><a href="#">Close</a></li></ul></div>' +
+                        '<span class="hidden">' + data.deviceList[i].id + '</span></td></tr>';
                 }
 
                 $("#device-table").children("tbody").html(htmlstr);
+                $('#device-table').DataTable.destroy();
+                $("#device-table").DataTable({
+
+                    });
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 alert('获取数据错误');
@@ -690,19 +710,6 @@
         })
     }
 </script>
-
-<!-- Imported styles on this page -->
-<link rel="stylesheet" href="/static/js/datatables/dataTables.bootstrap.css">
-
-<!-- Bottom Scripts -->
-<script src="/static/js/bootstrap.min.js"></script>
-<script src="/static/js/TweenMax.min.js"></script>
-<script src="/static/js/resizeable.js"></script>
-<script src="/static/js/joinable.js"></script>
-<script src="/static/js/xenon-api.js"></script>
-<script src="/static/js/xenon-toggles.js"></script>
-<script src="/static/js/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/static/js/toastr/toastr.min.js"></script>
 
 
 <!-- Imported scripts on this page -->
