@@ -11,3 +11,4 @@ class Device(models.Model):
     temperature = models.IntegerField()
     threshold = models.IntegerField()
     user = models.ForeignKey(User)
+    is_open = models.BooleanField()

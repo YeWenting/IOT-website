@@ -27,9 +27,14 @@
 		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
 		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
-<style>
-    .error{color:#d5080f}
-</style>
+    <style>
+        .error {
+            color: #d5080f
+        }
+        .action-checkbox:{
+            padding-top: 2px; padding-bottom: 2px; margin-left: 5px
+        }
+    </style>
 
 </head>
 <body class="page-body">
@@ -163,7 +168,8 @@
                 <li>
                     <a href="#">
                         <i class="linecons-pencil"></i>
-                        <span class="title add-device" onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" >Add Devices</span>
+                        <span class="title add-device"
+                              onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});">Add Devices</span>
                     </a>
                 </li>
                 <li class="opened active">
@@ -337,7 +343,7 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Devices List</h3>
-{#                <a href="javascript:" onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" class="fa fa-plus pull-right "> </a>#}
+                {#                <a href="javascript:" onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" class="fa fa-plus pull-right "> </a>#}
                 <span onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});"
                       class="fa fa-plus pull-right " style="cursor: pointer"> </span>
             </div>
@@ -396,20 +402,20 @@
                                 </a>
                                 <span class='hidden device-id'>{{ x.id }}</span>
                                 <div class="btn-group">
-									<button type="button" class="btn btn-blue dropdown-toggle btn-sm " data-toggle=
+                                    <button type="button" class="btn btn-blue dropdown-toggle btn-sm " data-toggle=
                                             "dropdown" style="padding-top: 2px; padding-bottom: 2px; margin-left: 5px">
-										Action
+                                        {{ x.status }}
                                         <span class="caret"></span>
-									</button>
-									<ul class="dropdown-menu dropdown-blue" role="menu">
-										<li>
-											<a href="#">Open</a>
-										</li>
-										<li>
-											<a href="#">Close</a>
-										</li>
-									</ul>
-								</div>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-blue" role="menu">
+                                        <li>
+                                            <a href="#">Open</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Close</a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -449,9 +455,9 @@
         </footer>
     </div>
 </div>
-<form class="modal fade" id="add-device"  role="form">
+<form class="modal fade" id="add-device" role="form">
     <div class="modal-dialog">
-        <div class="modal-content" style="margin-top: 150px" >
+        <div class="modal-content" style="margin-top: 150px">
 
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -465,7 +471,8 @@
 
                         <div class="form-group">
                             <label for="add_SN" class="control-label">SN</label>
-                            <input type="text" class="form-control" id="add_SN" name="add_SN" placeholder="identification">
+                            <input type="text" class="form-control" id="add_SN" name="add_SN"
+                                   placeholder="identification">
                         </div>
 
                     </div>
@@ -474,7 +481,8 @@
 
                         <div class="form-group">
                             <label for="add_device_name" class="control-label">Device Name</label>
-                            <input type="text" class="form-control" id="add_device_name" name="add_device_name" placeholder="name">
+                            <input type="text" class="form-control" id="add_device_name" name="add_device_name"
+                                   placeholder="name">
                         </div>
 
                     </div>
@@ -484,14 +492,16 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="add_temperature" class="control-label">Temperature(℃)</label>
-                            <input type="text" class="form-control" id="add_temperature" name="add_temperature" placeholder="current temp">
+                            <input type="text" class="form-control" id="add_temperature" name="add_temperature"
+                                   placeholder="current temp">
                         </div>
                     </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="add_threshold" class="control-label">Warning Threshold(℃)</label>
-                            <input type="text" class="form-control" id="add_threshold" name="add_threshold" placeholder="dangerous temp">
+                            <input type="text" class="form-control" id="add_threshold" name="add_threshold"
+                                   placeholder="dangerous temp">
                         </div>
                     </div>
                 </div>
@@ -523,32 +533,28 @@
 <!-- My Script -->
 {#add {} will destory it #}
 <script>
-    jQuery(document).ready(function($)
-    {
+    jQuery(document).ready(function ($) {
         var opts = {
-                    "closeButton": true,
-                    "debug": false,
-                    "positionClass": "toast-top-full-width",
-                    "onclick": null,
-                    "showDuration": "300",
-                    "hideDuration": "1000",
-                    "timeOut": "5000",
-                    "extendedTimeOut": "1000",
-                    "showEasing": "swing",
-                    "hideEasing": "linear",
-                    "showMethod": "fadeIn",
-                    "hideMethod": "fadeOut"
-                };
+            "closeButton": true,
+            "debug": false,
+            "positionClass": "toast-top-full-width",
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
 
-        $(".delete-button").on("click", function ()
-        {
+        $(".delete-button").on("click", function () {
             console.log($(this).closest("tr"));
             id = $(this).closest("tr").find(".device-id").text();
             console.log(id);
-            $.post("/devices/delete/", {device_id: id}, function(resp)
-            {
-                if (resp)
-                {
+            $.post("/devices/delete/", {device_id: id}, function (resp) {
+                if (resp) {
                     toastr.success("Device has been deleted successfully!", "Success", opts);
                     reload_table();
                 }
@@ -667,7 +673,13 @@
                         '<td> <a href="#" class="btn btn-secondary btn-sm btn-icon icon-left">Edit</a>' +
                         '<a href="#" class="btn btn-danger btn-sm btn-icon icon-left">Delete </a>' +
                         '<a href="#" class="btn btn-info btn-sm btn-icon icon-left">History </a>' +
-                        '</td></tr>';
+                        '<td> <div class="btn-group">' +
+                        '<button type="button" class="btn btn-blue dropdown-toggle btn-sm action-checkbox"' +
+                        'data-toggle="dropdown">' + data.deviceList[i].status +
+                        '<span class="caret"></span> </button>' +
+                        '<ul class="dropdown-menu dropdown-blue" role="menu">' +
+                        '<li><a href="#">Open</a></li><li><a href="#">Close</a></li></ul></div></td></tr>';
+                    '</td></tr>';
                 }
 
                 $("#device-table").children("tbody").html(htmlstr);

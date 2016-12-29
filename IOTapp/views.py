@@ -20,9 +20,15 @@ def get_index(request):
             is_warning = True
         else:
             is_warning = False
+
+        if dev.is_open:
+            status = "Active"
+        else:
+            status = "Inactive"
+
         print(dev.last_updated)
         temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.temperature, "is_warning": is_warning,
-                    "last_updated": dev.last_updated}
+                    "last_updated": dev.last_updated, "status": status}
         list.append(temp_dev)
 
     return render(request, 'index.html', {'deviceList': list})
@@ -90,9 +96,15 @@ def get_list(request):
             is_warning = True
         else:
             is_warning = False
+
+        if dev.is_open:
+            status = "Active"
+        else:
+            status = "Inactive"
+
         print(dev.last_updated)
         temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.temperature, "is_warning": is_warning,
-                    "last_updated": str(dev.last_updated)}
+                    "last_updated": dev.last_updated, "status": status}
         list.append(temp_dev)
 
     res = {"deviceList": list}
