@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="/static/css/xenon-components.css">
     <link rel="stylesheet" href="/static/css/xenon-skins.css">
     <link rel="stylesheet" href="/static/css/custom.css">
-    {#    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.13/se-1.2.0/datatables.css"/>#}
 
     <script src="/static/js/jquery-1.11.1.min.js"></script>
 
@@ -354,6 +353,19 @@
 
             <div class="panel-body">
 
+                <script type="text/javascript">
+                    jQuery(document).ready(function ($) {
+                        var table = $("#device-table").dataTable({
+                            "columnDefs": [
+                                {
+                                    "targets": [5],
+                                    "bSortable": false
+                                }
+                            ]
+
+                        });
+                    });
+                </script>
 
                 <table id="device-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
@@ -379,28 +391,37 @@
                     </tfoot>
                     <tbody>
                     {% for x in deviceList %}
-                        <tr class="123">
+                        <tr>
                             <td class="device-SN">{{ x.SN }}</td>
                             <td>{{ x.name }}</td>
                             <td>{{ x.temp }}</td>
                             <td>{{ x.last_updated }}</td>
                             <td>{{ x.is_warning }}</td>
                             <td>
-                                {#                                <div class="btn-group">#}
-                                {#                                    <a type="button" class="btn btn-blue dropdown-toggle btn-sm action-checkbox"#}
-                                {#                                       data-toggle="dropdown" style="margin-left:5px">#}
-                                {#                                        {{ x.status }}#}
-                                {#                                        <span class="caret"></span>#}
-                                {#                                    </a>#}
-                                {#                                    <ul class="dropdown-menu dropdown-blue" role="menu">#}
-                                {#                                        <li>#}
-                                {#                                            <a href="#">Open</a>#}
-                                {#                                        </li>#}
-                                {#                                        <li>#}
-                                {#                                            <a href="#">Close</a>#}
-                                {#                                        </li>#}
-                                {#                                    </ul>#}
-                                {#                                </div>#}
+                                <a type="button" class="btn btn-secondary btn-sm btn-icon icon-left edit-button">
+                                    Edit
+                                </a>
+                                <a type="button" class="btn btn-danger btn-sm btn-icon icon-left delete-button">
+                                    Delete
+                                </a>
+                                <a type="button" class="btn btn-info btn-sm btn-icon icon-left history-button">
+                                    History
+                                </a>
+                                <div class="btn-group">
+                                    <a type="button" class="btn btn-blue dropdown-toggle btn-sm action-checkbox"
+                                       data-toggle="dropdown" style="margin-left:5px">
+                                        {{ x.status }}
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-blue" role="menu">
+                                        <li>
+                                            <a href="#">Open</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Close</a>
+                                        </li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -517,7 +538,7 @@
 
 
 <!-- Imported styles on this page -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+
 <link rel="stylesheet" href="/static/js/datatables/dataTables.bootstrap.css">
 
 <!-- Bottom Scripts -->
@@ -527,47 +548,16 @@
 <script src="/static/js/joinable.js"></script>
 <script src="/static/js/xenon-api.js"></script>
 <script src="/static/js/xenon-toggles.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-<script type="text/javascript"
-        src="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.13/se-1.2.0/datatables.js"></script>
+<script src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+<script src="/static/js/toastr/toastr.min.js"></script>
 <!-- My Script -->
 <script>
     jQuery(document).ready(function ($) {
-        var table = $("#device-table").DataTable({
-            "ajax": "/api/getlist/",
-            "columnDefs": [
-                {
-                    "targets": [5],
-                    "bSortable": false
-                },
-                {
-                    "targets": -1,
-                    "data": null,
-                    "defaultContent": '<a type="button" class="btn btn-secondary btn-sm btn-icon icon-left edit-button">'
-                    + 'Edit </a>' + '<a type="button" class="btn btn-danger btn-sm btn-icon icon-left delete-button">'
-                    + 'Delete </a>'
-                    + '<a type="button" class="btn btn-info btn-sm btn-icon icon-left history-button">'
-                    + 'History </a>'
-                }
-            ]
-        });
-        $('#device-table').on('click', '.delete-button', function () {
-            SN = $($(this).parents('tr').children("td").get(0)).text();
-            console.log(SN);
-            $.post("/devices/delete/", {"device_SN": SN}, function (resp) {
-                if (resp) {
-                    toastr.success("Device has been deleted successfully!", "Success", opts);
-                    table.ajax.reload();
-                }
-                else toastr.error("Deletion failed:(", "Fail", opts);
-            });
-
-        });
-
+        reload_table();
         var opts = {
             "closeButton": true,
             "debug": false,
-            "positionClass": "toast-top-center",
+            "positionClass": "toast-top-full-width",
             "onclick": null,
             "showDuration": "300",
             "hideDuration": "1000",
@@ -578,6 +568,19 @@
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
         };
+
+        $("#device-table").on("click", ".delete-button", function () {
+
+            SN = $(this).closest("tr").find(".device-SN").text();
+            $.post("/devices/delete/", {device_id: SN}, function (resp) {
+                if (resp) {
+                    toastr.success("Device has been deleted successfully!", "Success", opts);
+                    $('#add-device').modal('hide');
+                    reload_table();
+                }
+                else toastr.error("Deletion failed:(", "Fail", opts);
+            });
+        });
 
         $("form#add-device").validate({
             rules: {
@@ -630,25 +633,18 @@
 
             // Form Processing via AJAX
             submitHandler: function (form) {
-
-                show_loading_bar(70);
-
-                SN = $(form).find('#add_SN').val();
-                name = $(form).find('#add_device_name').val();
-                last_updated = $(form).find('#add_last_updated').val();
-                temperature = $(form).find('#add_temperature').val();
-                threshold = $(form).find('#add_threshold').val()
+                show_loading_bar(70); // Fill progress bar to 70% (just a given value)
 
                 $.ajax({
                     url: "/adddevice/",
                     method: 'POST',
                     dataType: 'json',
                     data: {
-                        "SN": SN,
-                        "name": name,
-                        "last_updated": last_updated,
-                        "temperature": temperature,
-                        "threshold": threshold
+                        SN: $(form).find('#add_SN').val(),
+                        name: $(form).find('#add_device_name').val(),
+                        last_updated: $(form).find('#add_last_updated').val(),
+                        temperature: $(form).find('#add_temperature').val(),
+                        threshold: $(form).find('#add_threshold').val()
                     },
                     success: function (resp) {
                         show_loading_bar({
@@ -657,8 +653,8 @@
                             finish: function () {
                                 // Redirect after successful login page (when progress bar reaches 100%)
                                 if (resp.status == "success") {
+                                    reload_table();
                                     $('#add-device').modal('hide');
-                                    table.ajax.reload();
                                     toastr.success("Add successfully!", "Success", opts);
                                 }
                                 else if (resp.status == "existed") {
@@ -675,12 +671,50 @@
 
             }
         });
+        {#        reload_table();#}
     });
+    function reload_table() {
+        $.ajax({
+            url: "/api/getlist/",
+            type: "get",
+            dataType: "JSON",
+            success: function (data) {
+                console.log(1);
+                $("#device-table").children("tbody").empty();
+                var htmlstr = "";
+                for (var i = 0; i < data.deviceList.length; i++) {
+                    htmlstr = htmlstr + "<tr>" +
+                        "<td>" + data.deviceList[i].SN + "</td>" +
+                        "<td>" + data.deviceList[i].name + "</td>" +
+                        "<td>" + data.deviceList[i].temp + "</td>" +
+                        "<td>" + data.deviceList[i].last_updated + "</td>" +
+                        "<td>" + data.deviceList[i].is_warning + "</td>" +
+                        '<td> <a type="button" class="btn btn-secondary btn-sm btn-icon icon-left edit-button">Edit</a>' +
+                        '<a type="button" class="btn btn-danger btn-sm btn-icon icon-left delete-button">Delete </a>' +
+                        '<a type="button" class="btn btn-info btn-sm btn-icon icon-left history-button">History </a>' +
+                        '<div class="btn-group ">' +
+                        '<button type="button" class="btn btn-blue dropdown-toggle btn-sm action-checkbox"' +
+                        'data-toggle="dropdown" style="margin-left:5px">' + data.deviceList[i].status +
+                        '<span class="caret"></span> </button>' +
+                        '<ul class="dropdown-menu dropdown-blue" role="menu">' +
+                        '<li><a href="#">Open</a></li><li><a href="#">Close</a></li></ul></div>' +
+                        '<span class="hidden">' + data.deviceList[i].id + '</span></td></tr>';
+                }
+
+                $("#device-table").children("tbody").html(htmlstr);
+                $('#device-table').DataTable.destroy();
+                $("#device-table").DataTable({});
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                alert('获取数据错误');
+            }
+        })
+    }
 </script>
 
 
 <!-- Imported scripts on this page -->
-{#<script src="/static/js/datatables/dataTables.bootstrap.js"></script>#}
+<script src="/static/js/datatables/dataTables.bootstrap.js"></script>
 {#<script src="/static/js/datatables/yadcf/jquery.dataTables.yadcf.js"></script>#}
 {#<script src="/static/js/datatables/tabletools/dataTables.tableTools.min.js"></script>#}
 <script src="/static/js/jquery-validate/jquery.validate.min.js"></script>

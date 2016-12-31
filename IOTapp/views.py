@@ -103,16 +103,11 @@ def get_list(request):
             status = "Inactive"
 
         print(dev.last_updated)
-        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.temperature, "is_warning": is_warning,
-                    "last_updated": dev.last_updated, "status": status}
+        temp_dev = [dev.SN, dev.name, dev.temperature, is_warning, dev.last_updated, status]
         list.append(temp_dev)
 
-    res = {"deviceList": list}
+    res = {"data": list}
     return JsonResponse(res)
-
-
-def get_form(request):
-    return render(request, 'static/form.html')
 
 
 def add_device(request):
@@ -143,21 +138,14 @@ def add_device(request):
 
 
 def delete_device(request):
-    print(request.POST['device_id'])
-    device_id = int(request.POST['device_id'])
-    devices = Device.objects.filter(id=device_id)
+    print(request.POST['device_SN'])
+    device_SN = request.POST['device_SN']
+    devices = Device.objects.filter(SN=device_SN)
 
-    if len(devices) < 0:
+    if len(devices) <= 0:
         resp = False
     else:
         resp = True
         devices.delete()
 
     return JsonResponse(resp, safe=False)
-
-
-
-
-
-
-

@@ -19,7 +19,7 @@ urlpatterns = [
     # url(r'^contacts/edit/$', views.edit),
     # url(r'^contacts/find/$', views.find)
     url(r'^api/getlist/', views.get_list),
-    url(r'^getform/$', views.get_form),
+    # url(r'^getform/$', views.get_form),
     url(r'^adddevice/$', views.add_device),
     url(r'^devices/delete/$', views.delete_device)
 ]
