@@ -1,3 +1,5 @@
+import django.utils.timezone as timezone
+
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -7,8 +9,8 @@ from django.contrib.auth.models import User
 class Device(models.Model):
     SN = models.CharField(max_length=10)
     name = models.CharField(max_length=20)
-    last_updated = models.DateTimeField()
-    temperature = models.IntegerField()
+    last_updated = models.DateTimeField(default=timezone.now)
+    temperature = models.IntegerField(default=0)
     threshold = models.IntegerField()
     user = models.ForeignKey(User)
     is_open = models.BooleanField()

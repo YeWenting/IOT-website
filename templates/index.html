@@ -441,13 +441,6 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="edit_temp" class="control-label">Temperature(℃)</label>
-                            <input type="text" class="form-control" id="edit_temp" name="edit_temp"
-                                   placeholder="current temp">
-                        </div>
-                    </div>
 
                     <div class="col-md-6">
                         <div class="form-group">
@@ -457,17 +450,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label for="edit_last_updated" class="control-label">Last Updated</label>
-                            <input type="text" class="form-control" id="edit_last_updated" name="edit_last_updated"
-                                   placeholder="YYYY-MM-DD HH:MM:SS">
-                        </div>
-                    </div>
-                </div>
-
             </div>
 
             <div class="modal-footer">
@@ -500,8 +482,25 @@
 <!-- My Script -->
 <script>
     var save_method = "Add";
-    jQuery(document).ready(function ($) {
-        var save_method = 0;
+    jQuery(document).ready(function ($)
+    {
+        /* Toastr.js setting*/
+        var opts = {
+            "closeButton": true,
+            "debug": false,
+            "positionClass": "toast-top-center",
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+
+        /* Initialize the DataTable */
         var table = $("#device-table").DataTable({
             "ajax": "/api/getlist/",
             "columnDefs": [
@@ -521,14 +520,11 @@
             ]
         });
 
-$('#device-table tbody').on( 'click', 'tr', function(){
-    console.log( table.row(this).data() );
-});
-
         $('#device-table').on('click', '.delete-button', function ()
         {
-            SN = $($(this).parents('tr').children("td").get(0)).text();
-            $.post("/devices/delete/", {"device_SN": SN}, function (resp) {
+            var id = table.row($(this).closest('tr')).data()[7];
+
+            $.post("/devices/delete/", {"device_id": id}, function (resp) {
                 if (resp) {
                     toastr.success("Device has been deleted successfully!", "Success", opts);
                     table.ajax.reload();
@@ -544,7 +540,7 @@ $('#device-table tbody').on( 'click', 'tr', function(){
             $('#edit-device').modal('show', {backdrop: 'static'});
             device_data = table.row($(this).closest('tr')).data();
 
-            /* Set info */
+            /* Initialize info */
             $('[name="edit_SN"]').val(device_data[0]);
             $('[name="edit_name"]').val(device_data[1]);
             $('[name="edit_temp"]').val(device_data[2]);
@@ -552,20 +548,11 @@ $('#device-table tbody').on( 'click', 'tr', function(){
             $('[name="edit_last_updated"]').val(device_data[3]);
         });
 
-        var opts = {
-            "closeButton": true,
-            "debug": false,
-            "positionClass": "toast-top-center",
-            "onclick": null,
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
+        $('#device-table').on('click', '.history-button', function ()
+        {
+            var id = table.row($(this).closest('tr')).data()[7];
+            location.href = "/devices/history/?id=" + id;
+        });
 
         $("form#edit-device").validate({
             rules: {
@@ -632,8 +619,6 @@ $('#device-table tbody').on( 'click', 'tr', function(){
                     data: {
                         "SN": $(form).find('#edit_SN').val(),
                         "name": $(form).find('#edit_name').val(),
-                        "last_updated": $(form).find('#edit_last_updated').val(),
-                        "temperature": $(form).find('#edit_temp').val(),
                         "threshold": $(form).find('#edit_threshold').val()
                     },
                     success: function (resp) {
@@ -641,10 +626,11 @@ $('#device-table tbody').on( 'click', 'tr', function(){
                             delay: .5,
                             pct: 100,
                             finish: function () {
+                                console.log(resp.status);
                                 // Redirect after successful login page (when progress bar reaches 100%)
                                 if (resp.status == "success") {
                                     /* Reset the table */
-                                    $('#edit-device').reset();
+                                    $('#edit-device')[0].reset();
                                     $('#edit-device').modal('hide');
 
                                     /* Reload the table*/

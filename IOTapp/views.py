@@ -11,31 +11,11 @@ from django.contrib.auth.decorators import login_required
 
 @login_required()
 def get_index(request):
-    list = []
-    userid = request.session['userid']
-    devices = Device.objects.filter(user=userid)
-
-    for dev in devices:
-        if dev.temperature > dev.threshold:
-            is_warning = True
-        else:
-            is_warning = False
-
-        if dev.is_open:
-            status = "Active"
-        else:
-            status = "Inactive"
-
-        print(dev.last_updated)
-        temp_dev = {"id": dev.id, "SN": dev.SN, "name": dev.name, "temp": dev.temperature, "is_warning": is_warning,
-                    "last_updated": dev.last_updated, "status": status}
-        list.append(temp_dev)
-
-    return render(request, 'index.html', {'deviceList': list})
+    return render(request, 'index.html')
 
 
 def switch_index(request):
-    return HttpResponseRedirect("home/")
+    return HttpResponseRedirect("/devices/")
 
 
 def get_login(request):
@@ -80,9 +60,18 @@ def get_sign_up(request):
         return JsonResponse(response, safe=False)
 
 
+@login_required()
 def get_logout(request):
     logout(request)
     return HttpResponseRedirect("/")
+
+
+@login_required()
+def get_history(request):
+
+    # Get the log HTML
+    if len(request.GET) == 0:
+        return HttpResponseRedirect('home')
 
 
 # API Method
@@ -105,8 +94,7 @@ def get_list(request):
         else:
             status = "Inactive"
 
-        print(dev.last_updated)
-        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated, is_warning, status, dev.threshold]
+        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated.strftime('%b %d, %Y  %H:%M'), is_warning, status, dev.threshold, dev.id]
         list.append(temp_dev)
 
     res = {"data": list}
@@ -118,8 +106,6 @@ def add_device(request):
     # Get info
     SN = request.POST['SN']
     name = request.POST['name']
-    last_updated = request.POST['last_updated']
-    temperature = int(request.POST['temperature'])
     threshold = int(request.POST['threshold'])
     userid = request.session['userid']
 
@@ -130,8 +116,7 @@ def add_device(request):
     else:
         try:
             user = User.objects.get(id=userid)
-            Device.objects.create(SN=SN, name=name, last_updated=last_updated,
-                                  temperature=temperature, threshold=threshold, user=user, is_open=True)
+            Device.objects.create(SN=SN, name=name, threshold=threshold, user=user, is_open=True)
             resp = {"status": "success"}
             print("success")
         except:
@@ -144,9 +129,9 @@ def add_device(request):
 @login_required()
 def delete_device(request):
 
-    print(request.POST['device_SN'])
-    device_SN = request.POST['device_SN']
-    devices = Device.objects.filter(SN=device_SN)
+    print(request.POST['device_id'])
+    device_id = request.POST['device_id']
+    devices = Device.objects.filter(id=device_id)
 
     if len(devices) <= 0:
         resp = False
@@ -163,16 +148,13 @@ def update_device(request):
     # Get info
     SN = request.POST['SN']
     name = request.POST['name']
-    last_updated = request.POST['last_updated']
-    temperature = int(request.POST['temperature'])
     threshold = int(request.POST['threshold'])
     userid = request.session['userid']
 
     # Process the request
     try:
         user = User.objects.get(id=userid)
-        Device.objects.filter(user=user, SN=SN).update(name=name, last_updated=last_updated,
-                                                       temperature=temperature, threshold=threshold);
+        Device.objects.filter(user=user, SN=SN).update(name=name, threshold=threshold);
         resp = {"status": "success"}
         print("success")
     except:
