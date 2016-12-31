@@ -103,7 +103,7 @@ def get_list(request):
             status = "Inactive"
 
         print(dev.last_updated)
-        temp_dev = [dev.SN, dev.name, dev.temperature, is_warning, dev.last_updated, status]
+        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated, is_warning, status]
         list.append(temp_dev)
 
     res = {"data": list}
