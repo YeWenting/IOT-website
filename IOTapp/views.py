@@ -6,11 +6,11 @@ from django.contrib.auth.models import User
 from IOTapp.models import Device
 from django.contrib.auth.decorators import login_required
 
+
 # Create your views here.
 
 @login_required()
 def get_index(request):
-
     list = []
     userid = request.session['userid']
     devices = Device.objects.filter(user=userid)
@@ -127,7 +127,7 @@ def add_device(request):
         try:
             user = User.objects.get(id=userid)
             Device.objects.create(SN=SN, name=name, last_updated=last_updated,
-                                           temperature=temperature, threshold=threshold, user=user, is_open=True)
+                                  temperature=temperature, threshold=threshold, user=user, is_open=True)
             resp = {"status": "success"}
             print("success")
         except:
@@ -149,3 +149,26 @@ def delete_device(request):
         devices.delete()
 
     return JsonResponse(resp, safe=False)
+
+
+def update_device(request):
+    # Get info
+    SN = request.POST['SN']
+    name = request.POST['name']
+    last_updated = request.POST['last_updated']
+    temperature = int(request.POST['temperature'])
+    threshold = int(request.POST['threshold'])
+    userid = request.session['userid']
+
+    # Process the request
+    try:
+        user = User.objects.get(id=userid)
+        Device.objects.filter(user=user, SN=SN).update(name=name, last_updated=last_updated,
+                                                       temperature=temperature, threshold=threshold);
+        resp = {"status": "success"}
+        print("success")
+    except:
+        resp = {"status": "invalid"}
+        print("fail")
+
+    return JsonResponse(resp)
