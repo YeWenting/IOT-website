@@ -12,3 +12,11 @@ class Device(models.Model):
     threshold = models.IntegerField()
     user = models.ForeignKey(User)
     is_open = models.BooleanField()
+
+
+class DeviceLog(models.Model):
+    user = models.ForeignKey(User)
+    SN = models.CharField(max_length=10)
+    name = models.CharField(max_length=20)
+    time = models.DateTimeField()
+    temperature = models.IntegerField()

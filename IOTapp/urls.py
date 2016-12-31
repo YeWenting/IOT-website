@@ -6,7 +6,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.switch_index),
-    url(r'^home/$', views.get_index, name="home"),
+    url(r'^devices/$', views.get_index, name="home"),
     # url(r'^contacts/$', views.getContacts, name="contacts"),
     # url(r'^cv/$', views.getCV),
     # url(r'^contacts/add/$', views.getAdd),

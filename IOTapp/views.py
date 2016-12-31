@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
-from IOTapp.models import Device
+from IOTapp.models import Device, DeviceLog
 from django.contrib.auth.decorators import login_required
 
 
@@ -88,8 +88,11 @@ def get_logout(request):
 # API Method
 @login_required()
 def get_list(request):
+
     list = []
-    devices = Device.objects.all()
+    userid = request.session['userid']
+    user = User.objects.get(id=userid)
+    devices = Device.objects.filter(user=user)
 
     for dev in devices:
         if dev.temperature > dev.threshold:
@@ -103,14 +106,15 @@ def get_list(request):
             status = "Inactive"
 
         print(dev.last_updated)
-        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated, is_warning, status]
+        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated, is_warning, status, dev.threshold]
         list.append(temp_dev)
 
     res = {"data": list}
     return JsonResponse(res)
 
-
+@login_required()
 def add_device(request):
+
     # Get info
     SN = request.POST['SN']
     name = request.POST['name']
@@ -137,7 +141,9 @@ def add_device(request):
     return JsonResponse(resp)
 
 
+@login_required()
 def delete_device(request):
+
     print(request.POST['device_SN'])
     device_SN = request.POST['device_SN']
     devices = Device.objects.filter(SN=device_SN)
@@ -151,7 +157,9 @@ def delete_device(request):
     return JsonResponse(resp, safe=False)
 
 
+@login_required()
 def update_device(request):
+
     # Get info
     SN = request.POST['SN']
     name = request.POST['name']
@@ -172,3 +180,12 @@ def update_device(request):
         print("fail")
 
     return JsonResponse(resp)
+
+
+@login_required()
+def get_log(request):
+    userid = request.session['userid']
+    logs = DeviceLog.objects.filter(user=userid)
+
+    res = {"data": logs}
+    return JsonResponse(res)
