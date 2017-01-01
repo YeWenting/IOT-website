@@ -24,6 +24,10 @@ def switch_index(request):
     return HttpResponseRedirect("/devices/")
 
 
+def get_404(request):
+    return render(request, '404.html')
+
+
 def get_login(request):
     if request.method == 'GET':
         return render(request, 'login.html')
@@ -75,6 +79,7 @@ def get_logout(request):
 @login_required()
 def get_history(request):
     return render(request, 'log.html')
+
 
 # API Method
 @login_required()
@@ -276,3 +281,5 @@ def open_device(request):
         resp = False
 
     return JsonResponse(resp, safe=False)
+
+

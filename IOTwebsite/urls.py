@@ -16,7 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url, include
 
+from IOTapp import views
+
 urlpatterns = [
     url(r'^', include('IOTapp.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^', views.get_404)
 ]
