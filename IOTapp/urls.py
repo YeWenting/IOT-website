@@ -23,5 +23,7 @@ urlpatterns = [
     url(r'^devices/add/$', views.add_device),
     url(r'^devices/update/$', views.update_device),
     url(r'^devices/delete/$', views.delete_device),
-    url(r'^devices/history/$', views.get_history)
+    url(r'^devices/history/$', views.get_history),
+    url(r'^api/addlog/$', views.add_log),
+    url(r'^api/getlog/$', views.get_log)
 ]

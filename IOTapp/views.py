@@ -5,6 +5,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from IOTapp.models import Device, DeviceLog
 from django.contrib.auth.decorators import login_required
+import django.utils.timezone as timezone
 
 
 # Create your views here.
@@ -68,25 +69,7 @@ def get_logout(request):
 
 @login_required()
 def get_history(request):
-
-    # Get the log HTML
-    if len(request.GET) == 0:
-        return HttpResponseRedirect('/')
-    SN = request.GET['SN']
-    list = []
-    logs = DeviceLog.objects.filter(SN=SN)
-
-    for log in logs:
-        name = Device.objects.filter(SN=SN)[0].name
-        if log.is_open:
-            status = "Active"
-        else:
-            status = "Inactive"
-        temp_log = {"SN": log.SN, "name": name, "temperature": log.temperature, "is_open": status,
-                    "time": log.time.strftime('%b %d, %Y  %H:%M')}
-        list.append(temp_log)
-
-    return render(request, 'log.html', {"logs": list})
+    return render(request, 'log.html')
 
 # API Method
 @login_required()
@@ -169,7 +152,7 @@ def update_device(request):
     # Process the request
     try:
         user = User.objects.get(id=userid)
-        Device.objects.filter(user=user, SN=SN).update(name=name, threshold=threshold);
+        Device.objects.filter(user=user, SN=SN).update(name=name, threshold=threshold)
         resp = {"status": "success"}
         print("success")
     except:
@@ -181,8 +164,52 @@ def update_device(request):
 
 @login_required()
 def get_log(request):
-    userid = request.session['userid']
-    logs = DeviceLog.objects.filter(user=userid)
 
-    res = {"data": logs}
+    logs = []
+    list = []
+    # Get the log HTML
+    if 'SN' not in request.GET:
+        logs = DeviceLog.objects.all()
+    else:
+        SN = request.GET['SN']
+        logs = DeviceLog.objects.filter(SN=SN)
+
+    for log in logs:
+        userid = request.session['userid']
+        devices = Device.objects.filter(SN=log.SN, user=userid)
+        if len(devices) == 0:
+            continue
+        name = devices[0].name
+        if log.is_open:
+            status = "Active"
+        else:
+            status = "Inactive"
+        temp_log = [log.SN, name, log.time.strftime('%b %d, %Y  %H:%M:%S'), log.temperature, status]
+        list.append(temp_log)
+
+    res = {"data": list}
     return JsonResponse(res)
+
+
+def add_log(request):
+    SN = 0
+    resp = {}
+    try:
+        SN = request.POST['SN']
+        working = Device.objects.filter(SN=SN)[0].is_open
+        if working:
+            temp = request.POST['temperature']
+            Device.objects.filter(SN=SN).update(temperature=temp, last_updated=timezone.now())
+            DeviceLog.objects.create(SN=SN, temperature=temp)
+            resp['add'] = True
+
+
+        # Give back the info
+        resp['is_open'] = working
+    except:
+        resp['add'] = False
+        resp['is_open'] = Device.objects.filter(SN=SN)[0].is_open
+        print("add log fail")
+
+    return JsonResponse(resp)
+

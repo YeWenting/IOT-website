@@ -256,15 +256,7 @@
                     </tfoot>
 
                     <tbody>
-                    {% for log in logs %}
-                        <tr>
-                            <td>{{ log.SN }}</td>
-                            <td>{{ log.name }}</td>
-                            <td>{{ log.time}}</td>
-                            <td>{{ log.temperature }}</td>
-                            <td>{{ log.state }}</td>
-                        </tr>
-                    {% endfor %}
+
                     </tbody>
                 </table>
 
@@ -302,9 +294,9 @@
     </div>
 </div>
 
-<div class="page-loading-overlay">
-    <div class="loader-2"></div>
-</div>
+{#<div class="page-loading-overlay">#}
+{#    <div class="loader-2"></div>#}
+{#</div>#}
 
 
 <!-- Imported styles on this page -->
@@ -325,8 +317,18 @@
 <script>
     jQuery(document).ready(function ($) {
 
+        var ajax_url;
+
+        if (window.location.href.match("SN") == null) ajax_url = "/api/getlog/";
+        else ajax_url = "/api/getlog/?" + window.location.href.split("?")[1];
+
         var table = $("#log-table").DataTable({
+            "ajax": ajax_url
         });
+
+        setInterval(function () {
+            table.ajax.reload();
+        }, 20000);
 
     });
 </script>
