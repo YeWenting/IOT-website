@@ -241,6 +241,7 @@
                         <th>Device Name</th>
                         <th>Time</th>
                         <th>Temperature</th>
+                        <th>State</th>
                     </tr>
                     </thead>
 
@@ -250,11 +251,20 @@
                         <th>Device Name</th>
                         <th>Time</th>
                         <th>Temperature</th>
+                        <th>State</th>
                     </tr>
                     </tfoot>
 
                     <tbody>
-
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ log.SN }}</td>
+                            <td>{{ log.name }}</td>
+                            <td>{{ log.time}}</td>
+                            <td>{{ log.temperature }}</td>
+                            <td>{{ log.state }}</td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
 
@@ -314,242 +324,10 @@
 <!-- My Script -->
 <script>
     jQuery(document).ready(function ($) {
-        var save_method = 0;
+
         var table = $("#log-table").DataTable({
-            "ajax": "/api/getlog/",
         });
 
-        $('#device-table').on('click', '.delete-button', function ()
-        {
-            SN = $($(this).parents('tr').children("td").get(0)).text();
-            $.post("/devices/delete/", {"device_SN": SN}, function (resp) {
-                if (resp) {
-                    toastr.success("Device has been deleted successfully!", "Success", opts);
-                    table.ajax.reload();
-                }
-                else toastr.error("Deletion failed:(", "Fail", opts);
-            });
-        });
-
-        $('#device-table').on('click', '.edit-button', function ()
-        {
-            save_method = "Edit";
-            $('#edit-device').find('#edit_SN').attr("readonly", "readonly");
-            $('#edit-device').modal('show', {backdrop: 'static'});
-
-            /* Set info */
-            $('[name="edit_SN"]').val($($(this).parents('tr').children("td").get(0)).text());
-            $('[name="edit_name"]').val($($(this).parents('tr').children("td").get(1)).text());
-            $('[name="edit_temp"]').val($($(this).parents('tr').children("td").get(2)).text());
-            $('[name="edit_last_updated"]').val($($(this).parents('tr').children("td").get(3)).text());
-        });
-
-        var opts = {
-            "closeButton": true,
-            "debug": false,
-            "positionClass": "toast-top-center",
-            "onclick": null,
-            "showDuration": "300",
-            "hideDuration": "1000",
-            "timeOut": "5000",
-            "extendedTimeOut": "1000",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-
-        $("form#edit-device").validate({
-            rules: {
-                edit_SN: {
-                    required: true
-                },
-
-                edit_name: {
-                    required: true
-                },
-
-                edit_temp: {
-                    required: true,
-                    number: true
-                },
-
-                edit_threshold: {
-                    required: true,
-                    number: true
-                },
-
-                edit_last_updated: {
-                    required: true
-                }
-            },
-
-            messages: {
-                edit_SN: {
-                    required: 'Please enter SN.'
-                },
-
-                edit_name: {
-                    required: 'Please enter device name.'
-                },
-
-                edit_temp: {
-                    required: 'Please enter temperature.',
-                    number: 'Please enter a number.'
-                },
-
-                edit_last_updated: {
-                    required: 'Please enter last updated field.'
-                },
-
-                edit_threshold: {
-                    required: 'Please enter threshold.',
-                    number: 'Please enter a number.'
-                }
-            },
-
-            // Form Processing via AJAX
-            submitHandler: function (form) {
-
-                show_loading_bar(70);
-
-                var save_url;
-                if (save_method == "Edit") save_url = '/devices/update/';
-                else save_url = '/devices/add/';
-
-                $.ajax({
-                    url: save_url,
-                    method: 'POST',
-                    dataType: 'json',
-                    data: {
-                        "SN": $(form).find('#edit_SN').val(),
-                        "name": $(form).find('#edit_name').val(),
-                        "last_updated": $(form).find('#edit_last_updated').val(),
-                        "temperature": $(form).find('#edit_temp').val(),
-                        "threshold": $(form).find('#edit_threshold').val()
-                    },
-                    success: function (resp) {
-                        show_loading_bar({
-                            delay: .5,
-                            pct: 100,
-                            finish: function () {
-                                // Redirect after successful login page (when progress bar reaches 100%)
-                                if (resp.status == "success") {
-                                    $('#edit-device').modal('hide');
-                                    table.ajax.reload();
-                                    save_method = "Add";
-                                    toastr.success(save_method +" successfully!", "Success", opts);
-                                }
-                                else if (resp.status == "existed") {
-                                    toastr.error("The device" + $(form).find('#edit_SN').val() + " has existed", "Error", opts);
-                                }
-                                else {
-                                    toastr.error("Your input data is invalid! Please try again.", "Error", opts);
-                                }
-                            }
-                        });
-
-                    }
-                });
-
-            }
-        });
-        $("form#edit-device").validate({
-            rules: {
-                edit_SN: {
-                    required: true
-                },
-
-                edit_device_name: {
-                    required: true
-                },
-
-                edit_temperature: {
-                    required: true,
-                    number: true
-                },
-
-                edit_threshold: {
-                    required: true,
-                    number: true
-                },
-
-                edit_last_updated: {
-                    required: true
-                }
-            },
-
-            messages: {
-                edit_SN: {
-                    required: 'Please enter SN.'
-                },
-
-                edit_device_name: {
-                    required: 'Please enter device name.'
-                },
-
-                edit_temperature: {
-                    required: 'Please enter temperature.',
-                    number: 'Please enter a number.'
-                },
-
-                edit_last_updated: {
-                    required: 'Please enter last updated field.'
-                },
-
-                edit_threshold: {
-                    required: 'Please enter threshold.',
-                    number: 'Please enter a number.'
-                }
-            },
-
-            // Form Processing via AJAX
-            submitHandler: function (form) {
-
-                show_loading_bar(70);
-
-                SN = $(form).find('#edit_SN').val();
-                name = $(form).find('#edit_device_name').val();
-                last_updated = $(form).find('#edit_last_updated').val();
-                temperature = $(form).find('#edit_temperature').val();
-                threshold = $(form).find('#edit_threshold').val()
-
-                $.ajax({
-                    url: "/devices/update/",
-                    method: 'POST',
-                    dataType: 'json',
-                    data: {
-                        "SN": SN,
-                        "name": name,
-                        "last_updated": last_updated,
-                        "temperature": temperature,
-                        "threshold": threshold
-                    },
-                    success: function (resp) {
-                        show_loading_bar({
-                            delay: .5,
-                            pct: 100,
-                            finish: function () {
-                                // Redirect after successful login page (when progress bar reaches 100%)
-                                if (resp.status == "success") {
-                                    $('#add-device').modal('hide');
-                                    table.ajax.reload();
-                                    toastr.success("Add successfully!", "Success", opts);
-                                }
-                                else if (resp.status == "existed") {
-                                    toastr.error("The device" + $(form).find('#add_SN').val() + " has existed", "Error", opts);
-                                }
-                                else {
-                                    toastr.error("Your input data is invalid! Please try again.", "Error", opts);
-                                }
-                            }
-                        });
-
-                    }
-                });
-
-            }
-        });
     });
 </script>
 

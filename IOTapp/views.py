@@ -71,8 +71,22 @@ def get_history(request):
 
     # Get the log HTML
     if len(request.GET) == 0:
-        return HttpResponseRedirect('home')
+        return HttpResponseRedirect('/')
+    SN = request.GET['SN']
+    list = []
+    logs = DeviceLog.objects.filter(SN=SN)
 
+    for log in logs:
+        name = Device.objects.filter(SN=SN)[0].name
+        if log.is_open:
+            status = "Active"
+        else:
+            status = "Inactive"
+        temp_log = {"SN": log.SN, "name": name, "temperature": log.temperature, "is_open": status,
+                    "time": log.time.strftime('%b %d, %Y  %H:%M')}
+        list.append(temp_log)
+
+    return render(request, 'log.html', {"logs": list})
 
 # API Method
 @login_required()
@@ -117,6 +131,7 @@ def add_device(request):
         try:
             user = User.objects.get(id=userid)
             Device.objects.create(SN=SN, name=name, threshold=threshold, user=user, is_open=True)
+            DeviceLog.objects.create(SN=SN)
             resp = {"status": "success"}
             print("success")
         except:

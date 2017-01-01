@@ -446,7 +446,7 @@
                         <div class="form-group">
                             <label for="edit_threshold" class="control-label">Warning Threshold(℃)</label>
                             <input type="text" class="form-control" id="edit_threshold" name="edit_threshold"
-                                   placeholder="Your new threshold">
+                                   placeholder="the warning temperature">
                         </div>
                     </div>
                 </div>
@@ -482,8 +482,7 @@
 <!-- My Script -->
 <script>
     var save_method = "Add";
-    jQuery(document).ready(function ($)
-    {
+    jQuery(document).ready(function ($) {
         /* Toastr.js setting*/
         var opts = {
             "closeButton": true,
@@ -520,8 +519,12 @@
             ]
         });
 
-        $('#device-table').on('click', '.delete-button', function ()
-        {
+        setInterval(function () {
+            table.ajax.reload();
+        }, 5000);
+
+
+        $('#device-table').on('click', '.delete-button', function () {
             var id = table.row($(this).closest('tr')).data()[7];
 
             $.post("/devices/delete/", {"device_id": id}, function (resp) {
@@ -533,8 +536,7 @@
             });
         });
 
-        $('#device-table').on('click', '.edit-button', function ()
-        {
+        $('#device-table').on('click', '.edit-button', function () {
             save_method = "Edit";
             $('#edit-device').find('#edit_SN').attr("readonly", "readonly");
             $('#edit-device').modal('show', {backdrop: 'static'});
@@ -548,10 +550,9 @@
             $('[name="edit_last_updated"]').val(device_data[3]);
         });
 
-        $('#device-table').on('click', '.history-button', function ()
-        {
-            var id = table.row($(this).closest('tr')).data()[7];
-            location.href = "/devices/history/?id=" + id;
+        $('#device-table').on('click', '.history-button', function () {
+            var SN = table.row($(this).closest('tr')).data()[0];
+            location.href = "/devices/history/?SN=" + SN;
         });
 
         $("form#edit-device").validate({
@@ -636,7 +637,7 @@
                                     /* Reload the table*/
                                     table.ajax.reload();
                                     save_method = "Add";
-                                    toastr.success(save_method +" successfully!", "Success", opts);
+                                    toastr.success(save_method + " successfully!", "Success", opts);
                                 }
                                 else if (resp.status == "existed") {
                                     toastr.error("The device" + $(form).find('#edit_SN').val() + " has existed", "Error", opts);
