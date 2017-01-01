@@ -346,13 +346,12 @@
             </div>
 
             <div class="panel-body">
-
                 <table id="device-table" class="table table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
                     <tr>
                         <th>SN</th>
                         <th>Device Name</th>
-                        <th>Temperature</th>
+                        <th>Temp(℃)</th>
                         <th>Last Updated</th>
                         <th>Warn</th>
                         <th>Operation</th>
@@ -363,7 +362,7 @@
                     <tr>
                         <th>SN</th>
                         <th>Device Name</th>
-                        <th>Temperature</th>
+                        <th>Temp(℃)</th>
                         <th>Last Updated</th>
                         <th>Warn</th>
                         <th>Operation</th>
@@ -476,12 +475,12 @@
 <script src="/static/js/joinable.js"></script>
 <script src="/static/js/xenon-api.js"></script>
 <script src="/static/js/xenon-toggles.js"></script>
+<script src="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.13/se-1.2.0/datatables.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-<script type="text/javascript"
-        src="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.13/se-1.2.0/datatables.js"></script>
 <!-- My Script -->
 <script>
     var save_method = "Add";
+    var state = 0;
     jQuery(document).ready(function ($) {
         /* Toastr.js setting*/
         var opts = {
@@ -491,7 +490,7 @@
             "onclick": null,
             "showDuration": "300",
             "hideDuration": "1000",
-            "timeOut": "4500",
+            "timeOut": "4400",
             "extendedTimeOut": "1000",
             "showEasing": "swing",
             "hideEasing": "linear",
@@ -515,20 +514,73 @@
                     + 'Delete </a>'
                     + '<a type="button" class="btn btn-info btn-sm btn-icon icon-left history-button">'
                     + 'History </a>'
+                    + '<div class="btn-group">'
+                    + '<button type="button" class="btn btn-blue dropdown-toggle btn-sm action-checkbox"'
+                    + 'data-toggle="dropdown" style="margin-left:5px">Switch '
+                    + '<span class="caret"></span></button>'
+                    + '<ul class="dropdown-menu dropdown-blue" role="menu"> <li> <a class="open-button" style="cursor: pointer">Open'
+                    + '</a></li><li><a class="close-button" style="cursor: pointer">Close</a></li></ul></div>'
                 }
             ],
             "createdRow": function (row, data, index) {
                 if (data[2] * 1 > data[6]) {
                     $('td', row).css("color", "red");
-                    $('td', row).css("font-weight", 700)
-                    toastr.warning("The device" + data[0]+ " is too hot", "Warning", opts);
+                    $('td', row).css("font-weight", 900);
+                    toastr.warning("The device " + data[0]+ " is too hot", "Warning", opts);
                 }
+                if (data[5] == false)
+                    $('td', row).css("color", "#72a230");
             }
         });
 
         setInterval(function () {
             table.ajax.reload();
         }, 5000);
+
+        $('#device-table').on('click', '.action-checkbox', function ()
+        {
+            if (state)
+                $(this).parent().removeClass("open");
+            else
+                $(this).parent().addClass("open");
+            state = 1 - state;
+        });
+
+        $('#device-table').on('click', '.close-button', function ()
+        {
+            /* Check if it's necessary */
+            var is_open = table.row($(this).closest('tr')).data()[5];
+            console.log(is_open);
+            if (!is_open) return;
+
+            var id = table.row($(this).closest('tr')).data()[7];
+
+
+            $.post("/api/close_device/", {"id": id}, function (resp) {
+                if (resp) {
+                    toastr.success("Device has been shut down successfully!", "Success", opts);
+                    table.ajax.reload();
+                }
+                else toastr.error("Operation failed:(", "Fail", opts);
+            });
+        });
+
+        $('#device-table').on('click', '.open-button', function ()
+        {
+            /* Check if it's necessary */
+            var is_open = table.row($(this).closest('tr')).data()[5];
+            if (is_open) return;
+
+            var id = table.row($(this).closest('tr')).data()[7];
+
+            $.post("/api/open_device/", {"id": id}, function (resp) {
+                if (resp) {
+                    toastr.success("Device has been open successfully!", "Success", opts);
+                    table.ajax.reload();
+                }
+                else toastr.error("Operation failed:(", "Fail", opts);
+            });
+        });
 
 
         $('#device-table').on('click', '.delete-button', function () {

@@ -27,5 +27,7 @@ urlpatterns = [
     url(r'^api/addlog/$', views.add_log),
     url(r'^api/getlog/$', views.get_log),
     url(r'^api/get_warning_log/$', views.get_warning_log),
-    url(r'^devices/warn/$', views.get_warn_index)
+    url(r'^devices/warn/$', views.get_warn_index),
+    url(r'^api/close_device/$', views.close_device),
+    url(r'^api/open_device/$', views.open_device)
 ]

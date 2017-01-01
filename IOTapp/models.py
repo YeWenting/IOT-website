@@ -13,7 +13,7 @@ class Device(models.Model):
     temperature = models.IntegerField(default=0)
     threshold = models.IntegerField()
     user = models.ForeignKey(User)
-    is_open = models.BooleanField()
+    is_open = models.BooleanField(default=True)
 
 
 class DeviceLog(models.Model):

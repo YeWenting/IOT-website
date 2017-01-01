@@ -91,12 +91,8 @@ def get_list(request):
         else:
             is_warning = False
 
-        if dev.is_open:
-            status = "Active"
-        else:
-            status = "Inactive"
-
-        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated.strftime('%b %d, %Y  %H:%M'), is_warning, status, dev.threshold, dev.id]
+        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated.strftime('%b %d, %Y  %H:%M'), is_warning,
+                    dev.is_open, dev.threshold, dev.id]
         list.append(temp_dev)
 
     res = {"data": list}
@@ -118,7 +114,7 @@ def add_device(request):
     else:
         try:
             user = User.objects.get(id=userid)
-            Device.objects.create(SN=SN, name=name, threshold=threshold, user=user, is_open=True)
+            Device.objects.create(SN=SN, name=name, threshold=threshold, user=user)
             DeviceLog.objects.create(SN=SN)
             resp = {"status": "success"}
             print("success")
@@ -206,9 +202,8 @@ def add_log(request):
             temp = request.POST['temperature']
             Device.objects.filter(SN=SN).update(temperature=temp, last_updated=timezone.now())
             DeviceLog.objects.create(SN=SN, temperature=temp)
-            resp['add'] = True
 
-
+        resp['add'] = True
         # Give back the info
         resp['is_open'] = working
     except:
@@ -245,3 +240,39 @@ def get_warning_log(request):
 
     res = {"data": list}
     return JsonResponse(res)
+
+
+@login_required()
+def close_device(request):
+    try:
+        id = request.POST['id']
+        device = Device.objects.get(id=id)
+        if device.is_open:
+            # Update device in every user
+            Device.objects.filter(SN=device.SN).update(is_open=False)
+
+            # Update DeviceLog db
+            DeviceLog.objects.create(SN=device.SN, temperature=device.temperature, is_open=False)
+        resp = True
+    except:
+        resp = False
+
+    return JsonResponse(resp, safe=False)
+
+
+@login_required()
+def open_device(request):
+    try:
+        id = request.POST['id']
+        device = Device.objects.get(id=id)
+        if not device.is_open:
+            # Update device in every user
+            Device.objects.filter(SN=device.SN).update(is_open=True)
+
+            # Update DeviceLog db
+            DeviceLog.objects.create(SN=device.SN, temperature=device.temperature, is_open=True)
+        resp = True
+    except:
+        resp = False
+
+    return JsonResponse(resp, safe=False)
