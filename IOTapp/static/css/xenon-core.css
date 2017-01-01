@@ -5414,6 +5414,7 @@ blockquote small {
 }
 .dataTables_wrapper .dataTables_length,
 .dataTables_wrapper .dataTables_filter {
+  float: right;
   padding-bottom: 5px;
 }
 .dataTables_wrapper .dataTables_filter .form-control {

@@ -475,7 +475,7 @@
 <script src="/static/js/joinable.js"></script>
 <script src="/static/js/xenon-api.js"></script>
 <script src="/static/js/xenon-toggles.js"></script>
-<script src="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.13/se-1.2.0/datatables.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/datatables.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 <!-- My Script -->
 <script>
@@ -500,6 +500,13 @@
 
         /* Initialize the DataTable */
         var table = $("#device-table").DataTable({
+                   dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+            'pdfHtml5'
+        ],
             "ajax": "/api/getlist/",
             "columnDefs": [
                 {
@@ -526,7 +533,7 @@
                 if (data[2] * 1 > data[6]) {
                     $('td', row).css("color", "red");
                     $('td', row).css("font-weight", 900);
-                    toastr.warning("The device " + data[0]+ " is too hot", "Warning", opts);
+                    toastr.warning("The device " + data[0] + " is too hot", "Warning", opts);
                 }
                 if (data[5] == false)
                     $('td', row).css("color", "#72a230");
@@ -537,8 +544,7 @@
             table.ajax.reload();
         }, 5000);
 
-        $('#device-table').on('click', '.action-checkbox', function ()
-        {
+        $('#device-table').on('click', '.action-checkbox', function () {
             if (state)
                 $(this).parent().removeClass("open");
             else
@@ -546,8 +552,7 @@
             state = 1 - state;
         });
 
-        $('#device-table').on('click', '.close-button', function ()
-        {
+        $('#device-table').on('click', '.close-button', function () {
             /* Check if it's necessary */
             var is_open = table.row($(this).closest('tr')).data()[5];
             console.log(is_open);
@@ -565,8 +570,7 @@
             });
         });
 
-        $('#device-table').on('click', '.open-button', function ()
-        {
+        $('#device-table').on('click', '.open-button', function () {
             /* Check if it's necessary */
             var is_open = table.row($(this).closest('tr')).data()[5];
             if (is_open) return;
