@@ -176,7 +176,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/devices/log/">
+                    <a href="/devices/history/">
                         <i class="linecons-note"></i>
                         <span class="title">Devices Log</span>
                     </a>
@@ -491,7 +491,7 @@
             "onclick": null,
             "showDuration": "300",
             "hideDuration": "1000",
-            "timeOut": "5000",
+            "timeOut": "4500",
             "extendedTimeOut": "1000",
             "showEasing": "swing",
             "hideEasing": "linear",
@@ -516,7 +516,14 @@
                     + '<a type="button" class="btn btn-info btn-sm btn-icon icon-left history-button">'
                     + 'History </a>'
                 }
-            ]
+            ],
+            "createdRow": function (row, data, index) {
+                if (data[2] * 1 > data[6]) {
+                    $('td', row).css("color", "red");
+                    $('td', row).css("font-weight", 700)
+                    toastr.warning("The device" + data[0]+ " is too hot", "Warning", opts);
+                }
+            }
         });
 
         setInterval(function () {

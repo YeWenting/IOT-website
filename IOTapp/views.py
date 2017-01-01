@@ -15,6 +15,11 @@ def get_index(request):
     return render(request, 'index.html')
 
 
+@login_required()
+def get_warn_index(request):
+    return render(request, 'warning_log.html')
+
+
 def switch_index(request):
     return HttpResponseRedirect("/devices/")
 
@@ -213,3 +218,30 @@ def add_log(request):
 
     return JsonResponse(resp)
 
+
+@login_required()
+def get_warning_log(request):
+
+    logs = []
+    list = []
+    # Get the log HTML
+    if 'SN' not in request.GET:
+        logs = DeviceLog.objects.all()
+    else:
+        SN = request.GET['SN']
+        logs = DeviceLog.objects.filter(SN=SN)
+
+    for log in logs:
+        userid = request.session['userid']
+
+        # Check the user authority & temperature
+        devices = Device.objects.filter(SN=log.SN, user=userid)
+        if len(devices) == 0 or devices[0].threshold > log.temperature:
+            continue
+
+        name = devices[0].name
+        temp_log = [log.SN, name, log.time.strftime('%b %d, %Y  %H:%M:%S'), log.temperature, devices[0].threshold]
+        list.append(temp_log)
+
+    res = {"data": list}
+    return JsonResponse(res)

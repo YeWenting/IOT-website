@@ -25,5 +25,7 @@ urlpatterns = [
     url(r'^devices/delete/$', views.delete_device),
     url(r'^devices/history/$', views.get_history),
     url(r'^api/addlog/$', views.add_log),
-    url(r'^api/getlog/$', views.get_log)
+    url(r'^api/getlog/$', views.get_log),
+    url(r'^api/get_warning_log/$', views.get_warning_log),
+    url(r'^devices/warn/$', views.get_warn_index)
 ]

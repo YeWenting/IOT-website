@@ -169,14 +169,14 @@
                         <span class="title">Devices List</span>
                     </a>
                 </li>
-                <li class="opened active">
-                    <a href="#">
+                <li>
+                    <a href="/devices/history/">
                         <i class="linecons-note"></i>
                         <span class="title">Devices Log</span>
                     </a>
                 </li>
-                <li>
-                    <a href="/devices/warn/">
+                <li class="opened active">
+                    <a href="#">
                         <i class="linecons-fire"></i>
                         <span class="title">Warning log</span>
                     </a>
@@ -206,8 +206,8 @@
         <div class="page-title">
 
             <div class="title-env">
-                <h1 class="title">Devices Log</h1>
-                <p class="description">View devices' history log easily.</p>
+                <h1 class="title">Warning Log</h1>
+                <p class="description">Help you to find the abnormal situation.</p>
             </div>
 
             <div class="breadcrumb-env">
@@ -218,7 +218,7 @@
                     </li>
                     <li class="active">
 
-                        <strong>Devices Log</strong>
+                        <strong>Warning Log</strong>
                     </li>
                 </ol>
 
@@ -229,7 +229,7 @@
         <!-- Basic Setup -->
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Devices Log</h3>
+                <h3 class="panel-title">Warning Log</h3>
             </div>
 
             <div class="panel-body">
@@ -241,7 +241,7 @@
                         <th>Device Name</th>
                         <th>Time</th>
                         <th>Temperature</th>
-                        <th>State</th>
+                        <th>Threshold</th>
                     </tr>
                     </thead>
 
@@ -251,7 +251,7 @@
                         <th>Device Name</th>
                         <th>Time</th>
                         <th>Temperature</th>
-                        <th>State</th>
+                        <th>Threshold</th>
                     </tr>
                     </tfoot>
 
@@ -319,8 +319,8 @@
 
         var ajax_url;
 
-        if (window.location.href.match("SN") == null) ajax_url = "/api/getlog/";
-        else ajax_url = "/api/getlog/?" + window.location.href.split("?")[1];
+        if (window.location.href.match("SN") == null) ajax_url = "/api/get_warning_log/";
+        else ajax_url = "/api/get_warning_log/?" + window.location.href.split("?")[1];
 
         var table = $("#log-table").DataTable({
             "ajax": ajax_url
