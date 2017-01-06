@@ -5412,7 +5412,10 @@ blockquote small {
 .panel > .table > thead > tr > th:after {
   display: none;
 }
-.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_length{
+  float: left;
+  padding-bottom: 5px;
+}
 .dataTables_wrapper .dataTables_filter {
   float: right;
   padding-bottom: 5px;
