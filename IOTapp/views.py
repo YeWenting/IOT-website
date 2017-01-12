@@ -12,12 +12,24 @@ import django.utils.timezone as timezone
 
 @login_required()
 def get_index(request):
-    return render(request, 'index.html')
+    userid = request.session['userid']
+    username = User.objects.get(id=userid).username
+    return render(request, 'index.html', {"username": username})
+
+
+
+@login_required()
+def get_history(request):
+    userid = request.session['userid']
+    username = User.objects.get(id=userid).username
+    return render(request, 'log.html', {"username": username})
 
 
 @login_required()
 def get_warn_index(request):
-    return render(request, 'warning_log.html')
+    userid = request.session['userid']
+    username = User.objects.get(id=userid).username
+    return render(request, 'warning_log.html', {"username": username})
 
 
 def switch_index(request):
@@ -74,11 +86,6 @@ def get_sign_up(request):
 def get_logout(request):
     logout(request)
     return HttpResponseRedirect("/")
-
-
-@login_required()
-def get_history(request):
-    return render(request, 'log.html')
 
 
 # API Method
@@ -141,6 +148,7 @@ def delete_device(request):
         resp = False
     else:
         resp = True
+        DeviceLog.objects.filter(SN=devices[0].SN).delete()
         devices.delete()
 
     return JsonResponse(resp, safe=False)
@@ -154,16 +162,19 @@ def update_device(request):
     name = request.POST['name']
     threshold = int(request.POST['threshold'])
     userid = request.session['userid']
+    user = User.objects.get(id=userid)
 
-    # Process the request
-    try:
-        user = User.objects.get(id=userid)
-        Device.objects.filter(user=user, SN=SN).update(name=name, threshold=threshold)
-        resp = {"status": "success"}
-        print("success")
-    except:
-        resp = {"status": "invalid"}
-        print("fail")
+    devices = Device.objects.filter(user=user, SN=SN)
+    if len(devices) == 0:
+        resp = {"status": "nonexisted"}
+    else:
+        try:
+            devices.update(name=name, threshold=threshold)
+            resp = {"status": "success"}
+            print("success")
+        except:
+            resp = {"status": "invalid"}
+            print("fail")
 
     return JsonResponse(resp)
 

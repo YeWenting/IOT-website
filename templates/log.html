@@ -182,9 +182,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/devices/setting/">
-                        <i class="linecons-cog"></i>
-                        <span class="title">Setting</span>
+                    <a href="/accounts/sign-up/">
+                        <i class="linecons-user"></i>
+                        <span class="title">Sign Up</span>
                     </a>
                 </li>
                 <li>
@@ -201,6 +201,63 @@
     </div>
 
     <div class="main-content">
+
+        <nav class="navbar user-info-navbar" role="navigation">
+
+            <!-- Left links for user info navbar -->
+            <ul class="user-info-menu left-links list-inline list-unstyled">
+
+                <li class="hidden-sm hidden-xs">
+                    <a href="#" data-toggle="sidebar">
+                        <i class="fa-bars"></i>
+                    </a>
+                </li>
+
+            </ul>
+
+
+            <!-- Right links for user info navbar -->
+            <ul class="user-info-menu right-links list-inline list-unstyled" style="margin-right: 3%;">
+
+                <li class="dropdown user-profile">
+                    <a href="#" data-toggle="dropdown">
+                        <img src="/static/images/user.png" alt="user-image" class="img-circle img-inline userpic-32"
+                             width="28"/>
+                        <span>
+								{{ username }}
+								<i class="fa-angle-down"></i>
+							</span>
+                    </a>
+
+                    <ul class="dropdown-menu user-profile-menu list-unstyled">
+                        <li>
+                            <a href="#edit-profile">
+                                <i class="fa-edit"></i>
+                                New Post
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#profile">
+                                <i class="fa-user"></i>
+                                Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#help">
+                                <i class="fa-info"></i>
+                                Help
+                            </a>
+                        </li>
+                        <li class="last">
+                            <a href="/accounts/logout/">
+                                <i class="fa-lock"></i>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
 
         <!-- User Info, Notifications and Menu Bar -->
         <div class="page-title">
@@ -310,9 +367,8 @@
 <script src="/static/js/joinable.js"></script>
 <script src="/static/js/xenon-api.js"></script>
 <script src="/static/js/xenon-toggles.js"></script>
+<script src="https://cdn.datatables.net/v/bs/jqc-1.12.4/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/datatables.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
-<script type="text/javascript"
-        src="https://cdn.datatables.net/v/bs-3.3.7/jqc-1.12.4/dt-1.10.13/se-1.2.0/datatables.js"></script>
 <!-- My Script -->
 <script>
     jQuery(document).ready(function ($) {
@@ -323,6 +379,13 @@
         else ajax_url = "/api/getlog/?" + window.location.href.split("?")[1];
 
         var table = $("#log-table").DataTable({
+            dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+            'pdfHtml5'
+        ],
             "ajax": ajax_url
         });
 

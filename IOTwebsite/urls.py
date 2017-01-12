@@ -20,6 +20,5 @@ from IOTapp import views
 
 urlpatterns = [
     url(r'^', include('IOTapp.urls')),
-    url(r'^admin/', admin.site.urls),
-    url(r'^', views.get_404)
+    url(r'^admin/', admin.site.urls)
 ]

@@ -188,9 +188,9 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/devices/setting/">
-                        <i class="linecons-cog"></i>
-                        <span class="title">Setting</span>
+                    <a href="/accounts/sign-up/">
+                        <i class="linecons-user"></i>
+                        <span class="title">Sign Up</span>
                     </a>
                 </li>
                 <li>
@@ -220,48 +220,6 @@
                     </a>
                 </li>
 
-                <li class="dropdown hover-line">
-                    <a href="#" data-toggle="dropdown">
-                        <i class="fa-bell-o"></i>
-                        <span class="badge badge-purple">7</span>
-                    </a>
-
-                    <ul class="dropdown-menu notifications">
-                        <li class="top">
-                            <p class="small">
-                                <a href="#" class="pull-right">Mark all Read</a>
-                                You have <strong>3</strong> new notifications.
-                            </p>
-                        </li>
-
-                        <li>
-                            <ul class="dropdown-menu-list list-unstyled ps-scrollbar">
-                                <li class="active notification-success">
-                                    <a href="#">
-                                        <i class="fa-user"></i>
-
-                                        <span class="line">
-												<strong>New user registered</strong>
-											</span>
-
-                                        <span class="line small time">
-												30 seconds ago
-											</span>
-                                    </a>
-                                </li>
-
-                            </ul>
-                        </li>
-
-                        <li class="external">
-                            <a href="#">
-                                <span>View all notifications</span>
-                                <i class="fa-link-ext"></i>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-
             </ul>
 
 
@@ -273,9 +231,9 @@
                         <img src="/static/images/user.png" alt="user-image" class="img-circle img-inline userpic-32"
                              width="28"/>
                         <span>
-								Ye Wenting
+								{{ username }}
 								<i class="fa-angle-down"></i>
-							</span>
+                        </span>
                     </a>
 
                     <ul class="dropdown-menu user-profile-menu list-unstyled">
@@ -283,12 +241,6 @@
                             <a href="#edit-profile">
                                 <i class="fa-edit"></i>
                                 New Post
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#settings">
-                                <i class="fa-wrench"></i>
-                                Settings
                             </a>
                         </li>
                         <li>
@@ -304,7 +256,7 @@
                             </a>
                         </li>
                         <li class="last">
-                            <a href="extra-lockscreen.html">
+                            <a href="/accounts/logout/">
                                 <i class="fa-lock"></i>
                                 Logout
                             </a>
@@ -341,8 +293,7 @@
             <div class="panel-heading">
                 <h3 class="panel-title">Devices List</h3>
                 {#                <a href="javascript:" onclick="jQuery('#add-device').modal('show', {backdrop: 'static'});" class="fa fa-plus pull-right "> </a>#}
-                <span onclick="jQuery('#edit-device').modal('show', {backdrop: 'static'});"
-                      class="fa fa-plus pull-right " style="cursor: pointer"> </span>
+                <span onclick="jQuery('#edit-device').modal('show', {backdrop: 'static'});" class="fa fa-plus pull-right " style="cursor: pointer"> </span>
             </div>
 
             <div class="panel-body">
@@ -475,7 +426,7 @@
 <script src="/static/js/joinable.js"></script>
 <script src="/static/js/xenon-api.js"></script>
 <script src="/static/js/xenon-toggles.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/v/bs/jqc-1.12.4/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/datatables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs-3.3.7/jszip-2.5.0/pdfmake-0.1.18/dt-1.10.13/b-1.2.4/b-colvis-1.2.4/b-flash-1.2.4/b-html5-1.2.4/b-print-1.2.4/datatables.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 <!-- My Script -->
 <script>
@@ -500,13 +451,6 @@
 
         /* Initialize the DataTable */
         var table = $("#device-table").DataTable({
-                   dom: 'Bfrtip',
-        buttons: [
-            'copyHtml5',
-            'excelHtml5',
-            'csvHtml5',
-            'pdfHtml5'
-        ],
             "ajax": "/api/getlist/",
             "columnDefs": [
                 {
@@ -556,10 +500,13 @@
             /* Check if it's necessary */
             var is_open = table.row($(this).closest('tr')).data()[5];
             console.log(is_open);
-            if (!is_open) return;
+            if (!is_open)
+            {
+                toastr.success("Device has been shut down successfully!", "Success", opts);
+                return;
+            }
 
             var id = table.row($(this).closest('tr')).data()[7];
-
 
             $.post("/api/close_device/", {"id": id}, function (resp) {
                 if (resp) {
@@ -573,7 +520,11 @@
         $('#device-table').on('click', '.open-button', function () {
             /* Check if it's necessary */
             var is_open = table.row($(this).closest('tr')).data()[5];
-            if (is_open) return;
+            if (is_open)
+            {
+                toastr.success("Device has been open successfully!", "Success", opts);
+                return;
+            }
 
             var id = table.row($(this).closest('tr')).data()[7];
 
@@ -704,6 +655,9 @@
                                 }
                                 else if (resp.status == "existed") {
                                     toastr.error("The device" + $(form).find('#edit_SN').val() + " has existed", "Error", opts);
+                                }
+                                else if (resp.status == "nonexisted") {
+                                    toastr.error("The device" + $(form).find('#edit_SN').val() + " does not  existed", "Error", opts);
                                 }
                                 else {
                                     toastr.error("Your input data is invalid! Please try again.", "Error", opts);
