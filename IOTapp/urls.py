@@ -15,6 +15,7 @@ urlpatterns = [
 
     # url(r'^accounts/login/$', views.get_login),
     url(r'^accounts/logout/$', views.get_logout),
+    url(r'^accounts/reset-password/$', views.get_reset_password),
     # url(r'^contacts/delete/$', views.delete),
     # url(r'^contacts/edit/$', views.edit),
     # url(r'^contacts/find/$', views.find)

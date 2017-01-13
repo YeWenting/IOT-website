@@ -83,6 +83,27 @@ def get_sign_up(request):
 
 
 @login_required()
+def get_reset_password(request):
+    userid = request.session['userid']
+    user = User.objects.get(id=userid)
+
+    if request.method == 'GET':
+        return render(request, 'reset-password.html', {"username": user.username})
+    elif request.method == 'POST':
+        response = True
+        new_password = request.POST['password']
+        try:
+            user.set_password(new_password)
+            user.save()
+        except:
+            response = False
+
+        print(response)
+        return JsonResponse(response, safe=False)
+
+
+
+@login_required()
 def get_logout(request):
     logout(request)
     return HttpResponseRedirect("/")
