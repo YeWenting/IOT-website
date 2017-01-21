@@ -13,8 +13,6 @@
 - Device Management (add/delete/edit)
 - Simulate Equipment to Submit Information
 
-<br>
-
 **Advanced Features:**
 
 - History Log
@@ -22,8 +20,6 @@
 - Device Switch
 - Warning Threshold
 - Generate Warning Log (excel, csv and pdf)
-
-<br>
 
 **Extra Features:**
 
@@ -40,8 +36,6 @@
 - jQuery DataTable
 - Toastr
 - Validate
-
-<br>
 
 **Back-end:**
 
