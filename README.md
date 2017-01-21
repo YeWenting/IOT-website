@@ -1,6 +1,6 @@
 # IOT-website
 
-## Demo
+### Demo
 
 <img src="/pic/demo.png"/>
 
