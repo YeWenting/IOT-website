@@ -8,8 +8,9 @@ from django.contrib.auth.decorators import login_required
 import django.utils.timezone as timezone
 
 
-# Create your views here.
-
+"""
+ The Device Views / Controller
+"""
 @login_required()
 def get_index(request):
     userid = request.session['userid']
@@ -17,29 +18,134 @@ def get_index(request):
     return render(request, 'index.html', {"username": username})
 
 
-
-@login_required()
-def get_history(request):
-    userid = request.session['userid']
-    username = User.objects.get(id=userid).username
-    return render(request, 'log.html', {"username": username})
-
-
-@login_required()
-def get_warn_index(request):
-    userid = request.session['userid']
-    username = User.objects.get(id=userid).username
-    return render(request, 'warning_log.html', {"username": username})
-
-
 def switch_index(request):
     return HttpResponseRedirect("/devices/")
 
 
-def get_404(request):
-    return render(request, '404.html')
+@login_required()
+def get_list(request):
+
+    list = []
+    userid = request.session['userid']
+    user = User.objects.get(id=userid)
+    devices = Device.objects.filter(user=user)
+
+    for dev in devices:
+        if dev.temperature > dev.threshold:
+            is_warning = True
+        else:
+            is_warning = False
+
+        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated.strftime('%b %d, %Y  %H:%M'), is_warning,
+                    dev.is_open, dev.threshold, dev.id]
+        list.append(temp_dev)
+
+    res = {"data": list}
+    return JsonResponse(res)
 
 
+@login_required()
+def add_device(request):
+
+    # Get info
+    SN = request.POST['SN']
+    name = request.POST['name']
+    threshold = int(request.POST['threshold'])
+    userid = request.session['userid']
+
+    # Process the request
+    if len(Device.objects.filter(user=userid, SN=SN)) > 0:
+        resp = {"status": "existed"}
+    else:
+        try:
+            user = User.objects.get(id=userid)
+            Device.objects.create(SN=SN, name=name, threshold=threshold, user=user)
+            DeviceLog.objects.create(SN=SN)
+            resp = {"status": "success"}
+        except:
+            resp = {"status": "invalid"}
+
+    return JsonResponse(resp)
+
+
+@login_required()
+def delete_device(request):
+
+    device_id = request.POST['device_id']
+    devices = Device.objects.filter(id=device_id)
+
+    if len(devices) <= 0:
+        resp = False
+    else:
+        resp = True
+        DeviceLog.objects.filter(SN=devices[0].SN).delete()
+        devices.delete()
+
+    return JsonResponse(resp, safe=False)
+
+
+@login_required()
+def update_device(request):
+
+    # Get info
+    SN = request.POST['SN']
+    name = request.POST['name']
+    threshold = int(request.POST['threshold'])
+    userid = request.session['userid']
+    user = User.objects.get(id=userid)
+
+    devices = Device.objects.filter(user=user, SN=SN)
+    if len(devices) == 0:
+        resp = {"status": "nonexisted"}
+    else:
+        try:
+            devices.update(name=name, threshold=threshold)
+            resp = {"status": "success"}
+        except:
+            resp = {"status": "invalid"}
+
+    return JsonResponse(resp)
+
+
+@login_required()
+def close_device(request):
+    try:
+        id = request.POST['id']
+        device = Device.objects.get(id=id)
+        if device.is_open:
+            # Update device in every user
+            Device.objects.filter(SN=device.SN).update(is_open=False)
+
+            # Update DeviceLog db
+            DeviceLog.objects.create(SN=device.SN, temperature=device.temperature, is_open=False)
+        resp = True
+    except:
+        resp = False
+
+    return JsonResponse(resp, safe=False)
+
+
+@login_required()
+def open_device(request):
+    try:
+        id = request.POST['id']
+        device = Device.objects.get(id=id)
+        if not device.is_open:
+            # Update device in every user
+            Device.objects.filter(SN=device.SN).update(is_open=True)
+
+            # Update DeviceLog db
+            DeviceLog.objects.create(SN=device.SN, temperature=device.temperature, is_open=True)
+        resp = True
+    except:
+        resp = False
+
+    return JsonResponse(resp, safe=False)
+
+
+"""
+ The User Views / Controller
+"""
 def get_login(request):
     if request.method == 'GET':
         return render(request, 'login.html')
@@ -54,12 +160,7 @@ def get_login(request):
                 response = True
                 request.session['username'] = user.username
                 request.session['userid'] = user.id
-            else:
-                print("user is not active")
-        else:
-            print("user is None")
-        print(request.session.keys())
-        # resp = serialize(response);
+
         return JsonResponse(response, safe=False)
 
 
@@ -98,7 +199,6 @@ def get_reset_password(request):
         except:
             response = False
 
-        print(response)
         return JsonResponse(response, safe=False)
 
 
@@ -109,95 +209,14 @@ def get_logout(request):
     return HttpResponseRedirect("/")
 
 
-# API Method
+"""
+ The Log Views
+"""
 @login_required()
-def get_list(request):
-
-    list = []
+def get_history(request):
     userid = request.session['userid']
-    user = User.objects.get(id=userid)
-    devices = Device.objects.filter(user=user)
-
-    for dev in devices:
-        if dev.temperature > dev.threshold:
-            is_warning = True
-        else:
-            is_warning = False
-
-        temp_dev = [dev.SN, dev.name, dev.temperature, dev.last_updated.strftime('%b %d, %Y  %H:%M'), is_warning,
-                    dev.is_open, dev.threshold, dev.id]
-        list.append(temp_dev)
-
-    res = {"data": list}
-    return JsonResponse(res)
-
-@login_required()
-def add_device(request):
-
-    # Get info
-    SN = request.POST['SN']
-    name = request.POST['name']
-    threshold = int(request.POST['threshold'])
-    userid = request.session['userid']
-
-    # Process the request
-    if len(Device.objects.filter(user=userid, SN=SN)) > 0:
-        resp = {"status": "existed"}
-        print("repeat")
-    else:
-        try:
-            user = User.objects.get(id=userid)
-            Device.objects.create(SN=SN, name=name, threshold=threshold, user=user)
-            DeviceLog.objects.create(SN=SN)
-            resp = {"status": "success"}
-            print("success")
-        except:
-            resp = {"status": "invalid"}
-            print("fail")
-
-    return JsonResponse(resp)
-
-
-@login_required()
-def delete_device(request):
-
-    print(request.POST['device_id'])
-    device_id = request.POST['device_id']
-    devices = Device.objects.filter(id=device_id)
-
-    if len(devices) <= 0:
-        resp = False
-    else:
-        resp = True
-        DeviceLog.objects.filter(SN=devices[0].SN).delete()
-        devices.delete()
-
-    return JsonResponse(resp, safe=False)
-
-
-@login_required()
-def update_device(request):
-
-    # Get info
-    SN = request.POST['SN']
-    name = request.POST['name']
-    threshold = int(request.POST['threshold'])
-    userid = request.session['userid']
-    user = User.objects.get(id=userid)
-
-    devices = Device.objects.filter(user=user, SN=SN)
-    if len(devices) == 0:
-        resp = {"status": "nonexisted"}
-    else:
-        try:
-            devices.update(name=name, threshold=threshold)
-            resp = {"status": "success"}
-            print("success")
-        except:
-            resp = {"status": "invalid"}
-            print("fail")
-
-    return JsonResponse(resp)
+    username = User.objects.get(id=userid).username
+    return render(request, 'log.html', {"username": username})
 
 
 @login_required()
@@ -246,9 +265,17 @@ def add_log(request):
     except:
         resp['add'] = False
         resp['is_open'] = Device.objects.filter(SN=SN)[0].is_open
-        print("add log fail")
 
     return JsonResponse(resp)
+
+"""
+ The Warning Log Views
+"""
+@login_required()
+def get_warn_index(request):
+    userid = request.session['userid']
+    username = User.objects.get(id=userid).username
+    return render(request, 'warning_log.html', {"username": username})
 
 
 @login_required()
@@ -279,39 +306,6 @@ def get_warning_log(request):
     return JsonResponse(res)
 
 
-@login_required()
-def close_device(request):
-    try:
-        id = request.POST['id']
-        device = Device.objects.get(id=id)
-        if device.is_open:
-            # Update device in every user
-            Device.objects.filter(SN=device.SN).update(is_open=False)
-
-            # Update DeviceLog db
-            DeviceLog.objects.create(SN=device.SN, temperature=device.temperature, is_open=False)
-        resp = True
-    except:
-        resp = False
-
-    return JsonResponse(resp, safe=False)
-
-
-@login_required()
-def open_device(request):
-    try:
-        id = request.POST['id']
-        device = Device.objects.get(id=id)
-        if not device.is_open:
-            # Update device in every user
-            Device.objects.filter(SN=device.SN).update(is_open=True)
-
-            # Update DeviceLog db
-            DeviceLog.objects.create(SN=device.SN, temperature=device.temperature, is_open=True)
-        resp = True
-    except:
-        resp = False
-
-    return JsonResponse(resp, safe=False)
-
-
+# 404 Page
+def get_404(request):
+    return render(request, '404.html')

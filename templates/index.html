@@ -10,7 +10,6 @@
 
     <title>IOT Control System - Ywt Design</title>
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Arimo:400,700,400italic">
     <link rel="stylesheet" href="/static/css/fonts/linecons/css/linecons.css">
     <link rel="stylesheet" href="/static/css/fonts/fontawesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="/static/css/bootstrap.css">
@@ -447,7 +446,7 @@
             "onclick": null,
             "showDuration": "300",
             "hideDuration": "1000",
-            "timeOut": "4400",
+            "timeOut": "4000",
             "extendedTimeOut": "1000",
             "showEasing": "swing",
             "hideEasing": "linear",
@@ -458,6 +457,7 @@
         /* Initialize the DataTable */
         var table = $("#device-table").DataTable({
             "ajax": "/api/getlist/",
+            "bAutoWidth": false,
             "columnDefs": [
                 {
                     "targets": [5],
